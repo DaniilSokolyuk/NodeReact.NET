@@ -1,0 +1,17 @@
+﻿@using NodeReact.AspNetCore
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AspNetCoreSample</title>
+    <script src="@Url.Content("~/client.bundle.js")" asp-append-version="true" ></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500">
+</head>
+<body>
+
+    @RenderBody()
+
+    @Html.ReactInitJavaScript()
+</body>
+</html>

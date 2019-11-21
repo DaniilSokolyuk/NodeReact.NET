@@ -1,0 +1,34 @@
+﻿using System;
+using Jering.Javascript.NodeJS;
+using Microsoft.Extensions.DependencyInjection;
+using NodeReact.Components;
+
+namespace NodeReact
+{
+    public static class ServiceCollectionExtensions
+    {
+        public static IServiceCollection AddNodeReact(this IServiceCollection services, Action<ReactConfiguration> configuration = null)
+        {
+            var config = new ReactConfiguration();
+            configuration?.Invoke(config);
+
+            services.AddSingleton(config);
+
+            services.AddSingleton<IComponentNameInvalidator, ComponentNameInvalidator>();
+            services.AddSingleton<IReactIdGenerator, ReactIdGenerator>();
+            services.AddSingleton<INodeInvocationService, NodeInvocationService>();
+
+
+            services.AddNodeJS();
+            services.Configure<NodeJSProcessOptions>(options => config.ConfigureNodeJSProcessOptions?.Invoke(options));
+            services.Configure<OutOfProcessNodeJSServiceOptions>(options => config.ConfigureOutOfProcessNodeJSServiceOptions?.Invoke(options));
+
+            services.AddScoped<IReactScopedContext, ReactScopedContext>();
+
+            services.AddTransient<ReactComponent>();
+            services.AddTransient<ReactRouterComponent>();
+
+            return services;
+        }
+    }
+}

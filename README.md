@@ -1,4 +1,4 @@
-# NodeReact.NET 
+# NodeReact.NET [![NuGet Version](https://img.shields.io/nuget/v/NodeReact.svg)](https://www.nuget.org/packages/NodeReact/) 
 
 Aalternative to [ReactJS.NET](https://github.com/reactjs/React.NET) with rendering in separated node.js process
 

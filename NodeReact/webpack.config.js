@@ -30,5 +30,15 @@ module.exports = [
 		},
 		mode: 'production',
         target: 'node',
-	},
+    },
+    {
+        entry: './Resources/react.js',
+        output: {
+            filename: 'react.generated.min.js',
+            path: path.resolve(__dirname, 'Resources/'),
+            libraryTarget: 'commonjs2',
+        },
+        mode: 'production',
+        target: 'node',
+    },
 ];

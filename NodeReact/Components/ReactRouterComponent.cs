@@ -48,18 +48,19 @@ namespace NodeReact.Components
         {
             using (var textWriter = new ArrayPooledTextWriter())
             {
-                textWriter.Write("new Function('");
 
                 textWriter.Write("var context={};");
-                textWriter.Write(ServerOnly ? "var html = ReactDOMServer.renderToStaticMarkup(React.createElement(" : "var html = ReactDOMServer.renderToString(React.createElement(");
+                textWriter.Write("Object.assign(context, {html:");
+
+                textWriter.Write(ServerOnly ? "ReactDOMServer.renderToStaticMarkup(React.createElement(" : "ReactDOMServer.renderToString(React.createElement(");
                 textWriter.Write(ComponentName);
                 textWriter.Write(",Object.assign(");
                 WriterSerialziedProps(textWriter);
                 textWriter.Write(",{location:\"");
                 textWriter.Write(Path);
-                textWriter.Write("\",context:context})));");
+                textWriter.Write("\",context:context})))");
 
-                textWriter.Write("context.html = html; return context;')();");
+                textWriter.Write("})");
 
 
                 return textWriter.GetMemoryOwner();

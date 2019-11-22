@@ -1,22 +1,22 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFrameworks>netstandard2.1;netcoreapp2.2</TargetFrameworks>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFrameworks>netstandard2.1;netcoreapp2.2</TargetFrameworks>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <None Remove="Resources\main.generated.js" />
-    <None Remove="Resources\main.generated.min.js" />
-  </ItemGroup>
+    <ItemGroup>
+        <None Remove="Resources\interop.generated.js" />
+        <None Remove="Resources\interop.generated.min.js" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\main.generated.js" LogicalName="WithoutReact"/>
-    <EmbeddedResource Include="Resources\main.generated.min.js" LogicalName="WithoutReactMin"/>
-  </ItemGroup>
+    <ItemGroup>
+        <EmbeddedResource Include="Resources\interop.generated.js" LogicalName="interopBundle"/>
+        <EmbeddedResource Include="Resources\interop.generated.min.js" LogicalName="interopBundleMin"/>
+    </ItemGroup>
 
-  <ItemGroup>
-      <PackageReference Include="Microsoft.AspNetCore.Mvc.ViewFeatures" Version="2.2.0" />
-      <PackageReference Include="Jering.Javascript.NodeJS" Version="4.4.0" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.ViewFeatures" Version="2.2.0" />
+        <PackageReference Include="Jering.Javascript.NodeJS" Version="4.4.0" />
+    </ItemGroup>
 
 </Project>

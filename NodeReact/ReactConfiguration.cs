@@ -42,27 +42,21 @@ namespace NodeReact
 
         /// <summary>
         /// Gets or sets the number of engines to initially start when a pool is created. 
-        /// Defaults to <c>Math.Max(Environment.ProcessorCount, 4)</c>.
+        /// Defaults to <c>Math.Max(Environment.ProcessorCount - 1, 1)</c>.
         /// </summary>
-        public int StartEngines { get; set; } = Math.Max(Environment.ProcessorCount, 4);
+        public int StartEngines { get; set; } = Math.Max(Environment.ProcessorCount - 1, 1);
 
         /// <summary>
         /// Gets or sets the number of max engines. 
-        /// Defaults  <c>Math.Max(Environment.ProcessorCount * 2, 8)</c>.
+        /// Defaults  <c>Math.Max(Environment.ProcessorCount, 2)</c>.
         /// </summary>
-        public int MaxEngines { get; set; } = Math.Max(Environment.ProcessorCount * 2, 8);
+        public int MaxEngines { get; set; } = Math.Max(Environment.ProcessorCount, 2);
 
         /// <summary>
         /// Gets or sets the maximum number of times an engine can be reused before it is disposed.
         /// <c>0</c> is unlimited. Defaults to <c>100</c>.
         /// </summary>
         public int MaxUsagesPerEngine { get; set; } = 100;
-
-        /// <summary>
-        /// Gets or sets whether the built-in version of React is loaded. If <c>false</c>, you must
-        /// provide your own version of React.
-        /// </summary>
-        public bool LoadReact { get; set; } = true;
 
         /// <summary>
         /// Gets or sets whether to use the debug version of React. This is slower, but gives

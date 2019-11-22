@@ -20,7 +20,14 @@ namespace NodeReact
 
 
             services.AddNodeJS();
-            services.Configure<NodeJSProcessOptions>(options => config.ConfigureNodeJSProcessOptions?.Invoke(options));
+            services.Configure<NodeJSProcessOptions>(options =>
+            {
+                config.ConfigureNodeJSProcessOptions?.Invoke(options);
+
+                options.EnvironmentVariables.Add("NODEREACT_MINWORKERS", config.StartEngines.ToString());
+                options.EnvironmentVariables.Add("NODEREACT_MAXWORKERS", config.MaxEngines.ToString());
+                options.EnvironmentVariables.Add("NODEREACT_MAXUSAGESPERFWORKER", config.MaxUsagesPerEngine.ToString());
+            });
             services.Configure<OutOfProcessNodeJSServiceOptions>(options => config.ConfigureOutOfProcessNodeJSServiceOptions?.Invoke(options));
 
             services.AddScoped<IReactScopedContext, ReactScopedContext>();

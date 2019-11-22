@@ -20,8 +20,6 @@ namespace NodeReact
 
         private readonly IEmbeddedResourcesService _embeddedResourcesService;
         private readonly INodeJSService _nodeJsService;
-        private readonly ReactConfiguration _configuration;
-        private readonly string[] _mappedFilesPaths;
         private readonly string _bundleName;
         
 
@@ -33,12 +31,11 @@ namespace NodeReact
             IOptions<NodeJSProcessOptions> nodeJsProcessOptions)
         {
             _nodeJsService = nodeJsService;
-            _configuration = configuration;
             _embeddedResourcesService = embeddedResourcesService;
 
-            _bundleName = configuration.UseDebugReact ? "WithoutReact" : "WithoutReactMin";
+            _bundleName = configuration.UseDebugReact ? "interopBundle" : "interopBundleMin";
 
-            _mappedFilesPaths = configuration.ScriptFilesWithoutTransform
+            var requireFiles = configuration.ScriptFilesWithoutTransform
                 .Select(relativePath =>
                 {
                     if (relativePath.StartsWith(hostingEnvironment.WebRootPath))
@@ -49,18 +46,20 @@ namespace NodeReact
                     relativePath = relativePath.TrimStart('~').TrimStart('/');
 
                     return Path.GetFullPath(Path.Combine(hostingEnvironment.WebRootPath, relativePath));
-                })
-                .ToArray();
+                });
+
+            //TODO: do this in configure
+            nodeJsProcessOptions.Value.EnvironmentVariables.Add("NODEREACT_REQUIREFILES", string.Join(',', requireFiles));
         }
 
         public async Task<T> Invoke<T>(string function, IMemoryOwner<char> code, CancellationToken cancellationToken = default)
         {
             var str = new string(code.Memory.Span);
 
-            var args = new object[] { _mappedFilesPaths, str };
+            var args = new object[] { str };
 
             // Invoke from cache
-            (bool success, T result) = await _nodeJsService.TryInvokeFromCacheAsync<T>(MODULE_CACHE_IDENTIFIER, function, args, cancellationToken).ConfigureAwait(false);
+            (bool success, T result) = await _nodeJsService.TryInvokeFromCacheAsync<T>(MODULE_CACHE_IDENTIFIER, function, args, cancellationToken);
             if (success)
             {
                 return result;
@@ -68,7 +67,7 @@ namespace NodeReact
 
             using (Stream moduleStream = _embeddedResourcesService.ReadAsStream(GetType().Assembly, _bundleName))
             {
-                return await _nodeJsService.InvokeFromStreamAsync<T>(moduleStream, MODULE_CACHE_IDENTIFIER, function, args, cancellationToken).ConfigureAwait(false);
+                return await _nodeJsService.InvokeFromStreamAsync<T>(moduleStream, MODULE_CACHE_IDENTIFIER, function, args, cancellationToken);
             }
 
         }

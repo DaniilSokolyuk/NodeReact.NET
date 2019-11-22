@@ -23,9 +23,7 @@ namespace NodeReact.Sample.Webpack.AspNetCore
                 config =>
                 {
                     config.AddScriptWithoutTransform("~/server.bundle.js");
-                    config.LoadReact = false;
                     config.UseDebugReact = true;
-                    config.MaxUsagesPerEngine = 2500;
                 });
         }
 

@@ -7,7 +7,9 @@
     "watch": "webpack --watch"
   },
   "devDependencies": {
+    "temp-write": "4.0.0",
     "workerpool": "5.0.2",
+    "filewatcher": "3.0.1",
     "prop-types": "15.7.2",
     "react": "16.8.6",
     "react-dom": "16.8.6",

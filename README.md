@@ -35,6 +35,8 @@ services.AddNodeReact(
 ```
 
 # Benchmarks
+
+Single Component
 ``` ini
 
 BenchmarkDotNet=v0.12.0, OS=Windows 10.0.17763.475 (1809/October2018Update/Redstone5)
@@ -45,8 +47,26 @@ Intel Core i7-7700 CPU 3.60GHz (Kaby Lake), 1 CPU, 8 logical and 4 physical core
 Job=InProcess  Toolchain=InProcessEmitToolchain  
 
 ```
-|                 Method |      Mean |     Error |    StdDev |    Median | Gen 0 | Gen 1 | Gen 2 | Allocated |
-|----------------------- |----------:|----------:|----------:|----------:|------:|------:|------:|----------:|
-| NodeReact_RenderSingle |  8.380 ms | 0.4387 ms | 1.2867 ms |  7.831 ms |     - |     - |     - | 638.34 KB |
-| ZeroReact_RenderSingle | 14.106 ms | 1.3290 ms | 3.8345 ms | 13.604 ms |     - |     - |     - |   4.73 KB |
-|   ReactJs_RenderSingle | 12.027 ms | 0.3590 ms | 0.9705 ms | 12.018 ms |     - |     - |     - | 898.66 KB |
+|                 Method |     Mean |    Error |   StdDev |   Median | Gen 0 | Gen 1 | Gen 2 |  Allocated |
+|----------------------- |---------:|---------:|---------:|---------:|------:|------:|------:|-----------:|
+| NodeReact_RenderSingle | 27.32 ms | 1.047 ms | 3.038 ms | 26.93 ms |     - |     - |     - | 1262.37 KB |
+| ZeroReact_RenderSingle | 48.73 ms | 2.198 ms | 6.165 ms | 48.48 ms |     - |     - |     - |    4.73 KB |
+|   ReactJs_RenderSingle | 55.89 ms | 2.289 ms | 6.714 ms | 54.03 ms |     - |     - |     - | 1305.15 KB |
+
+
+Web Simulation (20 parallel req., 2 components per request)
+``` ini
+
+BenchmarkDotNet=v0.12.0, OS=Windows 10.0.17763.475 (1809/October2018Update/Redstone5)
+Intel Core i7-7700 CPU 3.60GHz (Kaby Lake), 1 CPU, 8 logical and 4 physical cores
+.NET Core SDK=3.0.100
+  [Host] : .NET Core 3.0.0 (CoreCLR 4.700.19.46205, CoreFX 4.700.19.46214), X64 RyuJIT
+
+Job=InProcess  Toolchain=InProcessEmitToolchain  
+
+```
+|                   Method |     Mean |    Error |    StdDev |     Gen 0 |     Gen 1 |     Gen 2 | Allocated |
+|------------------------- |---------:|---------:|----------:|----------:|----------:|----------:|----------:|
+|  NodeReact_WebSimulation | 276.1 ms |  8.06 ms |  23.77 ms | 5000.0000 | 1000.0000 |         - |  49.36 MB |
+|  ZeroReact_WebSimulation | 492.4 ms | 24.94 ms |  72.76 ms |         - |         - |         - |    1.6 MB |
+| ReactJSNet_WebSimulation | 814.0 ms | 37.94 ms | 111.26 ms | 5000.0000 | 3000.0000 | 2000.0000 |  66.98 MB |

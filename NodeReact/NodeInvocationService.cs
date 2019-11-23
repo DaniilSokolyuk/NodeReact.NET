@@ -62,9 +62,7 @@ namespace NodeReact
 
         public async Task<T> Invoke<T>(string function, IMemoryOwner<char> code, CancellationToken cancellationToken = default)
         {
-            var str = new string(code.Memory.Span);
-
-            var args = new object[] { str };
+            var args = new object[] { code };
 
             // Invoke from cache
             (bool success, T result) = await _nodeJsService.TryInvokeFromCacheAsync<T>(MODULE_CACHE_IDENTIFIER, function, args, cancellationToken);

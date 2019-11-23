@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using Microsoft.Extensions.DependencyInjection;
+using NodeReact.Components;
 using React;
 using ZeroReactComponent = ZeroReact.Components.ReactComponent;
 using NodeReactComponent = NodeReact.Components.ReactComponent;
@@ -10,6 +11,24 @@ namespace NodeReact.Benchmarks
 	public class SingleComponentBenchmark : BaseBenchmark
 	{
 		private readonly NoTextWriter tk = new NoTextWriter();
+
+        [Benchmark]
+        public async Task NodeReact_RenderRouterSingle()
+        {
+            using (var scope = sp.CreateScope())
+            {
+                var reactContext = scope.ServiceProvider.GetRequiredService<NodeReact.IReactScopedContext>();
+
+                var component = reactContext.CreateComponent<ReactRouterComponent>("__desktopComponents.App");
+                component.Props = _testData;
+                component.ServerOnly = true;
+                component.Path = "/movie/246436/";
+
+                await component.RenderRouterWithContext();
+
+                component.WriteOutputHtmlTo(tk);
+            }
+        }
 
         [Benchmark]
         public async Task NodeReact_RenderSingle()
@@ -28,7 +47,7 @@ namespace NodeReact.Benchmarks
             }
         }
 
-        [Benchmark]
+       // [Benchmark]
         public async Task ZeroReact_RenderSingle()
         {
             using (var scope = sp.CreateScope())
@@ -45,7 +64,7 @@ namespace NodeReact.Benchmarks
             }
         }
 
-        [Benchmark]
+      //  [Benchmark]
 	    public void ReactJs_RenderSingle()
 	    {
 		    var environment = AssemblyRegistration.Container.Resolve<IReactEnvironment>();

@@ -113,7 +113,7 @@ namespace NodeReact.Components
             WriteSpan(writer, SerializedProps);
         }
 
-        protected string OutputHtml { get; set; }
+        protected IMemoryOwner<char> OutputHtml { get; set; }
         public void WriteOutputHtmlTo(TextWriter writer)
         {
             if (ServerOnly)
@@ -181,6 +181,7 @@ namespace NodeReact.Components
 
         public virtual void Dispose()
         {
+            OutputHtml?.Dispose();
             SerializedProps?.Dispose();
         }
     }

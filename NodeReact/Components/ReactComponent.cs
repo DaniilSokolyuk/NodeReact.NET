@@ -33,7 +33,8 @@ namespace NodeReact.Components
             {
                 try
                 {
-                    OutputHtml = await _nodeInvocationService.Invoke<string>("evalCode", executeEngineCode);
+                    var renderResult = await _nodeInvocationService.Invoke<RenderResult>("evalCode", executeEngineCode);
+                    OutputHtml = renderResult.html;
                 }
                 catch (Exception ex)
                 {
@@ -46,14 +47,25 @@ namespace NodeReact.Components
         {
             using (var writer = new ArrayPooledTextWriter())
             {
+                writer.Write("var context={};");
+                writer.Write("Object.assign(context, {html:");
+
                 writer.Write(ServerOnly ? "ReactDOMServer.renderToStaticMarkup(React.createElement(" : "ReactDOMServer.renderToString(React.createElement(");
                 writer.Write(ComponentName);
                 writer.Write(',');
                 WriterSerialziedProps(writer);
                 writer.Write("))");
 
+                writer.Write("})");
+
                 return writer.GetMemoryOwner();
             }
+        }
+
+        private class RenderResult
+        {
+            public IMemoryOwner<char> html { get; set; }
+
         }
     }
 }

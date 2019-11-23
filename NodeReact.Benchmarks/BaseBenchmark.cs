@@ -19,22 +19,13 @@ namespace NodeReact.Benchmarks
 		[GlobalSetup]
 		public void Setup()
 		{
-			PopulateTestData();
 			RegisterZeroReactAndNodeReact();
             RegisterReact();
 		}
-		
-		protected JObject _testData = JObject.FromObject(new Dictionary<string, string>() { ["name"] = "Tester" });
+
+        protected JObject _testData = JObject.Parse(File.ReadAllText("hugeComponentData.json"));
 
 		protected IServiceProvider sp;
-
-		protected void PopulateTestData()
-		{
-			for (int i = 0; i < 10; i++)
-			{
-				_testData.Add("key" + i, "value" + i);
-			}
-		}
 
         protected void RegisterZeroReactAndNodeReact()
 		{
@@ -43,7 +34,7 @@ namespace NodeReact.Benchmarks
 			services.AddZeroReactCore(
 				config =>
 				{
-					config.AddScriptWithoutTransform("Sample.js");
+					config.AddScriptWithoutTransform("hugeBundle.js");
 					config.StartEngines = Environment.ProcessorCount;
 					config.MaxEngines = Environment.ProcessorCount;
                     config.MaxUsagesPerEngine = 300;
@@ -55,9 +46,8 @@ namespace NodeReact.Benchmarks
                 {
                     config.StartEngines = Environment.ProcessorCount;
                     config.MaxEngines = Environment.ProcessorCount;
-                    
-                    config.AddScriptWithoutTransform("SampleNode.js")
-                        .AddScriptWithoutTransform("react.generated.min.js");
+
+                    config.AddScriptWithoutTransform("hugeBundle.js");
                 });
 
             sp = services.BuildServiceProvider();
@@ -76,13 +66,13 @@ namespace NodeReact.Benchmarks
 			var configuration = ReactSiteConfiguration.Configuration;
 			configuration
 				.SetReuseJavaScriptEngines(true)
-				.SetAllowJavaScriptPrecompilation(false);
-			configuration
+				.SetAllowJavaScriptPrecompilation(false)
 				.SetStartEngines(Environment.ProcessorCount)
 				.SetMaxEngines(Environment.ProcessorCount)
 				.SetMaxUsagesPerEngine(1000)
 				.SetLoadBabel(false)
-				.AddScriptWithoutTransform("Sample.js");
+                .SetLoadReact(false)
+				.AddScriptWithoutTransform("hugeBundle.js");
 		}
 		
 		public class NoTextWriter : TextWriter

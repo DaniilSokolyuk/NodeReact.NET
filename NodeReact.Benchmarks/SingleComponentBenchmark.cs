@@ -18,7 +18,7 @@ namespace NodeReact.Benchmarks
             {
                 var reactContext = scope.ServiceProvider.GetRequiredService<NodeReact.IReactScopedContext>();
 
-                var component = reactContext.CreateComponent<NodeReactComponent>("__desktopComponents.App");
+                var component = reactContext.CreateComponent<NodeReactComponent>("__components.MovieAboutPage");
                 component.Props = _testData;
                 component.ServerOnly = true;
 
@@ -35,7 +35,7 @@ namespace NodeReact.Benchmarks
             {
                 var reactContext = scope.ServiceProvider.GetRequiredService<ZeroReact.IReactScopedContext>();
 
-                var component = reactContext.CreateComponent<ZeroReactComponent>("__desktopComponents.App");
+                var component = reactContext.CreateComponent<ZeroReactComponent>("__components.MovieAboutPage");
                 component.Props = _testData;
                 component.ServerOnly = true;
 
@@ -49,7 +49,7 @@ namespace NodeReact.Benchmarks
 	    public void ReactJs_RenderSingle()
 	    {
 		    var environment = AssemblyRegistration.Container.Resolve<IReactEnvironment>();
-		    var component = environment.CreateComponent("__desktopComponents.App", _testData, serverOnly: true);
+		    var component = environment.CreateComponent("__components.MovieAboutPage", _testData, serverOnly: true);
 
 		    component.RenderHtml(tk, renderServerOnly: true);
 		    environment.ReturnEngineToPool();

@@ -22,7 +22,7 @@ namespace NodeReact.Benchmarks
                     {
                         var reactContext = scope.ServiceProvider.GetRequiredService<NodeReact.IReactScopedContext>();
 
-                        var component = reactContext.CreateComponent<NodeReact.Components.ReactComponent>("HelloWorld");
+                        var component = reactContext.CreateComponent<NodeReact.Components.ReactComponent>("__components.MovieAboutPage");
                         component.Props = _testData;
 
                         await component.RenderHtml();
@@ -49,7 +49,7 @@ namespace NodeReact.Benchmarks
                     {
                         var reactContext = scope.ServiceProvider.GetRequiredService<ZeroReact.IReactScopedContext>();
 
-                        var component = reactContext.CreateComponent<ZeroReact.Components.ReactComponent>("HelloWorld");
+                        var component = reactContext.CreateComponent<ZeroReact.Components.ReactComponent>("__components.MovieAboutPage");
                         component.Props = _testData;
 
                         await component.RenderHtml();
@@ -72,7 +72,7 @@ namespace NodeReact.Benchmarks
                 var environment = AssemblyRegistration.Container.Resolve<IReactEnvironment>();
                 foreach (var ind in Enumerable.Range(0, 30))
                 {
-                    var component = environment.CreateComponent("HelloWorld", _testData);
+                    var component = environment.CreateComponent("__components.MovieAboutPage", _testData);
 
                     component.RenderHtml(tk);
                     environment.ReturnEngineToPool();

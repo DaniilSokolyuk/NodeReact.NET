@@ -18,7 +18,7 @@ namespace NodeReact.Benchmarks
             {
                 using (var scope = sp.CreateScope())
                 {
-                    foreach (var ind in Enumerable.Range(0, 30))
+                    foreach (var ind in Enumerable.Range(0, 2))
                     {
                         var reactContext = scope.ServiceProvider.GetRequiredService<NodeReact.IReactScopedContext>();
 
@@ -45,7 +45,7 @@ namespace NodeReact.Benchmarks
             {
                 using (var scope = sp.CreateScope())
                 {
-                    foreach (var ind in Enumerable.Range(0, 30))
+                    foreach (var ind in Enumerable.Range(0, 2))
                     {
                         var reactContext = scope.ServiceProvider.GetRequiredService<ZeroReact.IReactScopedContext>();
 
@@ -70,7 +70,7 @@ namespace NodeReact.Benchmarks
             Parallel.For(0, 20, i =>
             {
                 var environment = AssemblyRegistration.Container.Resolve<IReactEnvironment>();
-                foreach (var ind in Enumerable.Range(0, 30))
+                foreach (var ind in Enumerable.Range(0, 2))
                 {
                     var component = environment.CreateComponent("__components.MovieAboutPage", _testData);
 

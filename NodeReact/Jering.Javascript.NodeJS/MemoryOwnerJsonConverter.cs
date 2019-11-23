@@ -7,7 +7,7 @@ using NodeReact.Utils;
 
 namespace NodeReact
 {
-    internal class CustomSerializerDeserializer : JsonConverter<IMemoryOwner<char>>
+    internal class MemoryOwnerJsonConverter : JsonConverter<IMemoryOwner<char>>
     {
         public override bool CanConvert(Type type)
         {

@@ -14,7 +14,7 @@ namespace NodeReact
     {
         private static readonly JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions
         {
-            Converters = { new CustomSerializerDeserializer() },
+            Converters = { new MemoryOwnerJsonConverter() },
             Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
             DefaultBufferSize = 64536,
 

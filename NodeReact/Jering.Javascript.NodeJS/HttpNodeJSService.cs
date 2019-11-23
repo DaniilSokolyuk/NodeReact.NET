@@ -26,9 +26,11 @@ namespace NodeReact
     {
         private static readonly JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions
         {
-            Converters = { new CustomSerializerDeserializer() },
+            Converters = { new MemoryOwnerJsonConverter() },
             Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-            DefaultBufferSize = 64536
+            DefaultBufferSize = 64536,
+
+            PropertyNameCaseInsensitive = true
         };
 
         internal const string SERVER_SCRIPT_NAME = "HttpServer.js";
@@ -93,8 +95,8 @@ namespace NodeReact
                     {
                         using (Stream stream = await httpResponseMessage.Content.ReadAsStreamAsync().ConfigureAwait(false))
                         {
-                            InvocationError invocationError = await JsonSerializer
-                                .DeserializeAsync<InvocationError>(stream, jsonSerializerOptions, cancellationToken).ConfigureAwait(false);
+                            NodeInvocationError invocationError = await JsonSerializer
+                                .DeserializeAsync<NodeInvocationError>(stream, jsonSerializerOptions, cancellationToken).ConfigureAwait(false);
                             throw new InvocationException(invocationError.ErrorMessage, invocationError.ErrorStack);
                         }
                     }

@@ -33,3 +33,20 @@ services.AddNodeReact(
         config.UseDebugReact = true;
     });
 ```
+
+# Benchmarks
+``` ini
+
+BenchmarkDotNet=v0.12.0, OS=Windows 10.0.17763.475 (1809/October2018Update/Redstone5)
+Intel Core i7-7700 CPU 3.60GHz (Kaby Lake), 1 CPU, 8 logical and 4 physical cores
+.NET Core SDK=3.0.100
+  [Host] : .NET Core 3.0.0 (CoreCLR 4.700.19.46205, CoreFX 4.700.19.46214), X64 RyuJIT
+
+Job=InProcess  Toolchain=InProcessEmitToolchain  
+
+```
+|                 Method |      Mean |     Error |    StdDev |    Median | Gen 0 | Gen 1 | Gen 2 | Allocated |
+|----------------------- |----------:|----------:|----------:|----------:|------:|------:|------:|----------:|
+| NodeReact_RenderSingle |  8.380 ms | 0.4387 ms | 1.2867 ms |  7.831 ms |     - |     - |     - | 638.34 KB |
+| ZeroReact_RenderSingle | 14.106 ms | 1.3290 ms | 3.8345 ms | 13.604 ms |     - |     - |     - |   4.73 KB |
+|   ReactJs_RenderSingle | 12.027 ms | 0.3590 ms | 0.9705 ms | 12.018 ms |     - |     - |     - | 898.66 KB |

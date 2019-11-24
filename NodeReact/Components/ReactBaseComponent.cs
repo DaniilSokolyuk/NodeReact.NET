@@ -118,7 +118,7 @@ namespace NodeReact.Components
         {
             if (ServerOnly)
             {
-                writer.Write(OutputHtml);
+                WriteSpan(writer, OutputHtml);
                 return;
             }
 
@@ -138,7 +138,7 @@ namespace NodeReact.Components
 
             if (!ClientOnly)
             {
-                writer.Write(OutputHtml);
+                WriteSpan(writer, OutputHtml);
             }
 
             writer.Write("</");

@@ -13,7 +13,7 @@ using ZeroReact;
 namespace NodeReact.Benchmarks
 {
 	[MemoryDiagnoser]
-	//[InProcess]
+	[InProcess]
     public abstract class BaseBenchmark
 	{
 		[GlobalSetup]

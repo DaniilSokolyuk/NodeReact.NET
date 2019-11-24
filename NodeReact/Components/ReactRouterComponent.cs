@@ -70,7 +70,7 @@ namespace NodeReact.Components
 
     public class RoutingContext
     {
-        internal IMemoryOwner<char> html { get; set; }
+        public IMemoryOwner<char> html { get; set; }
 
         /// <summary>
         /// HTTP Status Code.

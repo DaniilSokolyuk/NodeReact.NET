@@ -80,7 +80,7 @@ namespace NodeReact.Benchmarks
             }
         }
 
-        [Benchmark]
+        //[Benchmark]
         public void ReactJs_RenderSingle()
         {
             var environment = AssemblyRegistration.Container.Resolve<IReactEnvironment>();

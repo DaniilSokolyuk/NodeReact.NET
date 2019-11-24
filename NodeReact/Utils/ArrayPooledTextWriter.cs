@@ -12,7 +12,7 @@ namespace NodeReact.Utils
         private static readonly ArrayPool<char> _pagePool = ArrayPool<char>.Shared;
         private static readonly ArrayPool<char[]> _rootPool = ArrayPool<char[]>.Shared;
 
-        public ArrayPooledTextWriter(int minPageSize = 8192)
+        public ArrayPooledTextWriter(int minPageSize = 16384)
         {
             if (minPageSize != 4096 && minPageSize != 8192 && minPageSize != 16384)
             {
@@ -137,14 +137,8 @@ namespace NodeReact.Utils
         {
             var length = Length;
 
-            //if (length == 0)
-            //{
-            //    return new PooledCharBuffer(Array.Empty<char>(), 0);
-            //}
-
             var charBuffer = BufferAllocator.Instance.Allocate<char>(length);
             var spanBuffer = charBuffer.Memory.Span;
-
 
             int index = 0;
 
@@ -154,9 +148,6 @@ namespace NodeReact.Utils
                 var pageLength = Math.Min(length, page.Length);
 
                 page.AsSpan(0, pageLength).CopyTo(spanBuffer.Slice(index, pageLength));
-
-               // var chh = new char[10];
-                //Array.Copy(page, 0, chh, index, pageLength);
 
                 length -= pageLength;
                 index += pageLength;

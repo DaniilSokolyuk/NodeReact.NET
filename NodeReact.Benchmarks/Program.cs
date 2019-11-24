@@ -13,7 +13,7 @@ namespace NodeReact.Benchmarks
 
             //for (int i = 0; i < 10000000; i++)
             //{
-            //    await tt.NodeReact_RenderSingle();
+            //    await tt.NodeReact_RenderRouterSingle();
             //}
 
 

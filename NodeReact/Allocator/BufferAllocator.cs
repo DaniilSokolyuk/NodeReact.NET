@@ -29,7 +29,7 @@ namespace NodeReact.Allocator
                     $"{nameof(BufferAllocator)} can not allocate {length} elements of {typeof(T).Name}.");
             }
 
-            ArrayPool<byte> pool = arrayPool;
+            ArrayPool<byte> pool = bufferSizeInBytes > 8192 ? arrayPool : ArrayPool<byte>.Shared;
             byte[] byteArray = pool.Rent(bufferSizeInBytes);
 
             var buffer = new PooledBuffer<T>(byteArray, length, pool);

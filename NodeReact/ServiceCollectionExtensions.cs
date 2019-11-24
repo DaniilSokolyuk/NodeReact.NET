@@ -1,6 +1,7 @@
 ﻿using System;
 using Jering.Javascript.NodeJS;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using NodeReact.Components;
 
 namespace NodeReact
@@ -29,6 +30,11 @@ namespace NodeReact
                 options.EnvironmentVariables.Add("NODEREACT_MAXUSAGESPERFWORKER", config.MaxUsagesPerEngine.ToString());
             });
             services.Configure<OutOfProcessNodeJSServiceOptions>(options => config.ConfigureOutOfProcessNodeJSServiceOptions?.Invoke(options));
+
+            services.Replace(new ServiceDescriptor(
+                typeof(INodeJSService),
+                typeof(HttpNodeJSService), 
+                ServiceLifetime.Singleton));
 
             services.AddScoped<IReactScopedContext, ReactScopedContext>();
 

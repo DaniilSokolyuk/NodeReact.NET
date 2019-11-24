@@ -3,7 +3,7 @@ using System.Buffers;
 
 namespace NodeReact.Utils
 {
-    public sealed class PooledCharBuffer : IMemoryOwner<char>
+    internal sealed class PooledCharBuffer : IMemoryOwner<char>
     {
         public PooledCharBuffer(char[] array, int length)
         {

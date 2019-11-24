@@ -13,7 +13,7 @@ using ZeroReact;
 namespace NodeReact.Benchmarks
 {
 	[MemoryDiagnoser]
-	[InProcess]
+	//[InProcess]
     public abstract class BaseBenchmark
 	{
 		[GlobalSetup]
@@ -37,7 +37,7 @@ namespace NodeReact.Benchmarks
 					config.AddScriptWithoutTransform("hugeBundle.js");
 					config.StartEngines = Environment.ProcessorCount;
 					config.MaxEngines = Environment.ProcessorCount;
-                    config.MaxUsagesPerEngine = 300;
+                    config.MaxUsagesPerEngine = int.MaxValue;
 					config.AllowJavaScriptPrecompilation = false;
 				});
 
@@ -69,7 +69,7 @@ namespace NodeReact.Benchmarks
 				.SetAllowJavaScriptPrecompilation(false)
 				.SetStartEngines(Environment.ProcessorCount)
 				.SetMaxEngines(Environment.ProcessorCount)
-				.SetMaxUsagesPerEngine(1000)
+				.SetMaxUsagesPerEngine(int.MaxValue)
 				.SetLoadBabel(false)
                 .SetLoadReact(false)
 				.AddScriptWithoutTransform("hugeBundle.js");

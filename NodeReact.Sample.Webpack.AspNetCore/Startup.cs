@@ -22,6 +22,11 @@ namespace NodeReact.Sample.Webpack.AspNetCore
             services.AddNodeReact(
                 config =>
                 {
+                    config.ConfigureOutOfProcessNodeJSServiceOptions = o =>
+                    {
+                        o.NumRetries = 0;
+                        o.TimeoutMS = 2000;
+                    };
                     config.AddScriptWithoutTransform("~/server.bundle.js");
                     config.UseDebugReact = true;
                 });

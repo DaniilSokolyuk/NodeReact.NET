@@ -30,6 +30,7 @@
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.Mvc.ViewFeatures" Version="2.2.0" />
         <PackageReference Include="Jering.Javascript.NodeJS" Version="4.4.0" />
+        <PackageReference Include="System.Text.Json" Version="4.6.0" />
     </ItemGroup>
 
 </Project>

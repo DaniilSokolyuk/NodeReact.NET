@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>netstandard2.1;netcoreapp2.2</TargetFrameworks>
+        <TargetFrameworks>netcoreapp2.1;netcoreapp2.2;netcoreapp3.0</TargetFrameworks>
 
         <Description>Aalternative to ReactJS.NET with rendering in separated node.js process</Description>
         <PackageTags>react, reactjs, nodejs</PackageTags>
@@ -27,8 +27,19 @@
         <EmbeddedResource Include="Resources\interop.generated.min.js" LogicalName="interopBundleMin" />
     </ItemGroup>
 
-    <ItemGroup>
+    <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp2.1'">
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.ViewFeatures" Version="2.1.0" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp2.2'">
         <PackageReference Include="Microsoft.AspNetCore.Mvc.ViewFeatures" Version="2.2.0" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp3.0'">
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    </ItemGroup>
+
+    <ItemGroup>
         <PackageReference Include="Jering.Javascript.NodeJS" Version="4.4.0" />
         <PackageReference Include="System.Text.Json" Version="4.6.0" />
     </ItemGroup>

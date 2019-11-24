@@ -9,16 +9,14 @@ namespace NodeReact.Allocator
     /// </summary>
     internal class BufferAllocator
     {
-        public static BufferAllocator Instance = new BufferAllocator(16 * 1024);
+        public static BufferAllocator Instance = new BufferAllocator();
 
-        public BufferAllocator(int poolSelectorThresholdInBytes)
+        public BufferAllocator()
         {
-            PoolSelectorThresholdInBytes = poolSelectorThresholdInBytes;
             InitArrayPools();
         }
 
-        private ArrayPool<byte> normalArrayPool;
-        private ArrayPool<byte> largeArrayPool;
+        private ArrayPool<byte> arrayPool;
 
         public IMemoryOwner<T> Allocate<T>(int length) where T : struct
         {
@@ -31,7 +29,7 @@ namespace NodeReact.Allocator
                     $"{nameof(BufferAllocator)} can not allocate {length} elements of {typeof(T).Name}.");
             }
 
-            ArrayPool<byte> pool = GetArrayPool(bufferSizeInBytes);
+            ArrayPool<byte> pool = arrayPool;
             byte[] byteArray = pool.Rent(bufferSizeInBytes);
 
             var buffer = new PooledBuffer<T>(byteArray, length, pool);
@@ -42,15 +40,7 @@ namespace NodeReact.Allocator
 
         private void InitArrayPools()
         {
-            largeArrayPool = ArrayPool<byte>.Shared;
-            normalArrayPool = ArrayPool<byte>.Shared;
+            arrayPool = ArrayPool<byte>.Create(128 * 1024 * 1024, 64);
         }
-
-        private ArrayPool<byte> GetArrayPool(int bufferSizeInBytes)
-        {
-            return bufferSizeInBytes <= PoolSelectorThresholdInBytes ? normalArrayPool : largeArrayPool;
-        }
-
-        public int PoolSelectorThresholdInBytes { get; set; }
     }
 }

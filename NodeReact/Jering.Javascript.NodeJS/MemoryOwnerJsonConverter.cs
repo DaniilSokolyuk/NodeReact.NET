@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using NodeReact.Allocator;
 using NodeReact.Utils;
 
 namespace NodeReact
@@ -33,11 +34,11 @@ namespace NodeReact
             int idx = span.IndexOf(BackSlash);
             if (idx != -1)
             {
-                byte[] unescapedArray = null;
+                IMemoryOwner<byte> unescapedArray = null;
 
                 Span<byte> utf8Unescaped = span.Length <= 256 ?
                     stackalloc byte[span.Length] :
-                    (unescapedArray = ArrayPool<byte>.Shared.Rent(span.Length));
+                    (unescapedArray = BufferAllocator.Instance.Allocate<byte>(span.Length)).Memory.Span;
 
                 JsonReaderHelperUnescape(span, utf8Unescaped, idx, out var written);
 
@@ -45,10 +46,7 @@ namespace NodeReact
 
                 var result = TranscodeHelper(utf8Unescaped);
 
-                if (unescapedArray != null)
-                {
-                    ArrayPool<byte>.Shared.Return(unescapedArray);
-                }
+                unescapedArray?.Dispose();
 
                 return result;
             }
@@ -56,12 +54,12 @@ namespace NodeReact
             return TranscodeHelper(span);
         }
 
-        private static PooledCharBuffer TranscodeHelper(ReadOnlySpan<byte> source)
+        private static IMemoryOwner<char> TranscodeHelper(ReadOnlySpan<byte> source)
         {
-            int maxCharsCount = Encoding.UTF8.GetMaxCharCount(source.Length);
-            var rentedArray = ArrayPool<char>.Shared.Rent(maxCharsCount);
-            var length = Encoding.UTF8.GetChars(source, rentedArray);
-            return new PooledCharBuffer(rentedArray, length);
+            int maxCharsCount = Encoding.UTF8.GetCharCount(source);
+            var buffer = BufferAllocator.Instance.Allocate<char>(maxCharsCount);
+            Encoding.UTF8.GetChars(source, buffer.Memory.Span);
+            return buffer;
         }
 
 

@@ -3,6 +3,7 @@ using System.Buffers;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
+using NodeReact.Allocator;
 
 namespace NodeReact.Utils
 {
@@ -136,12 +137,14 @@ namespace NodeReact.Utils
         {
             var length = Length;
 
-            if (length == 0)
-            {
-                return new PooledCharBuffer(Array.Empty<char>(), 0);
-            }
+            //if (length == 0)
+            //{
+            //    return new PooledCharBuffer(Array.Empty<char>(), 0);
+            //}
 
-            char[] charBuffer = _pagePool.Rent(length);
+            var charBuffer = BufferAllocator.Instance.Allocate<char>(length);
+            var spanBuffer = charBuffer.Memory.Span;
+
 
             int index = 0;
 
@@ -150,13 +153,16 @@ namespace NodeReact.Utils
                 var page = _pages[i];
                 var pageLength = Math.Min(length, page.Length);
 
-                Array.Copy(page, 0, charBuffer, index, pageLength);
+                page.AsSpan(0, pageLength).CopyTo(spanBuffer.Slice(index, pageLength));
+
+               // var chh = new char[10];
+                //Array.Copy(page, 0, chh, index, pageLength);
 
                 length -= pageLength;
                 index += pageLength;
             }
 
-            return new PooledCharBuffer(charBuffer, index);
+            return charBuffer;
         }
 
         public override string ToString()

@@ -7,7 +7,7 @@
         <PackageTags>react, reactjs, nodejs</PackageTags>
         <Authors>Daniil Sokolyuk</Authors>
 
-        <VersionPrefix>1.0.3</VersionPrefix>
+        <VersionPrefix>1.0.4</VersionPrefix>
 
         <PackageProjectUrl>https://github.com/DaniilSokolyuk/NodeReact.NET</PackageProjectUrl>
         <RepositoryUrl>https://github.com/DaniilSokolyuk/NodeReact.NET</RepositoryUrl>
@@ -15,6 +15,8 @@
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
 
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
+
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
     <ItemGroup>
@@ -40,8 +42,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Jering.Javascript.NodeJS" Version="4.4.0" />
-        <PackageReference Include="System.Text.Json" Version="4.6.0" />
+        <PackageReference Include="Jering.Javascript.NodeJS" Version="5.0.0" />
+        <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     </ItemGroup>
 
 </Project>

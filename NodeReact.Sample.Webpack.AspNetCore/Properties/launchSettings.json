@@ -1,6 +1,6 @@
 ﻿{
   "profiles": {
-    "ZeroReact.Sample.Webpack.AspNetCore": {
+    "NodeReact.Sample.Webpack.AspNetCore": {
       "commandName": "Project",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"

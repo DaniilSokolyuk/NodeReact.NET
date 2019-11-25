@@ -13,12 +13,12 @@ namespace NodeReact.Benchmarks
 
             //for (int i = 0; i < 10000000; i++)
             //{
-            //    await tt.NodeReact_RenderSingle();
+            //    await tt.NodeReact_RenderRouterSingle();
             //}
 
 
             BenchmarkRunner.Run<SingleComponentBenchmark>();
-           // BenchmarkRunner.Run<WebSimulateBenchmark>();
+            BenchmarkRunner.Run<WebSimulateBenchmark>();
             Console.ReadKey();
 		}
 	}

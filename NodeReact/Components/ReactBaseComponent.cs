@@ -151,11 +151,11 @@ namespace NodeReact.Components
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void WriteSpan(TextWriter viewWriter, IMemoryOwner<char> owner)
         {
-            if (owner is PooledCharBuffer buffer)
-            {
-                viewWriter.Write(buffer._array, 0, buffer._length);
-            }
-            else
+            //if (owner is PooledCharBuffer buffer)
+            //{
+            //    viewWriter.Write(buffer._array, 0, buffer._length);
+            //}
+            //else
             {
                 viewWriter.Write(owner.Memory.Span);
             }

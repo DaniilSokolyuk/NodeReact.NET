@@ -3,7 +3,7 @@
     <PropertyGroup>
         <TargetFrameworks>netcoreapp2.1;netcoreapp2.2;netcoreapp3.0</TargetFrameworks>
 
-        <Description>Aalternative to ReactJS.NET with rendering in separated node.js process</Description>
+        <Description>Library to render React library components on the server-side with C# as well as on the client.</Description>
         <PackageTags>react, reactjs, nodejs</PackageTags>
         <Authors>Daniil Sokolyuk</Authors>
 

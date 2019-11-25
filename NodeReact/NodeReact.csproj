@@ -42,8 +42,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Jering.Javascript.NodeJS" Version="4.4.1" />
-        <PackageReference Include="System.Text.Json" Version="4.6.0" />
+        <PackageReference Include="Jering.Javascript.NodeJS" Version="5.0.0" />
+        <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     </ItemGroup>
 
 </Project>

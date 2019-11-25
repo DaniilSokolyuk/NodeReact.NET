@@ -3,6 +3,7 @@ using Jering.Javascript.NodeJS;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using NodeReact.Components;
+using NodeReact.Jering.Javascript.NodeJS;
 
 namespace NodeReact
 {
@@ -32,8 +33,8 @@ namespace NodeReact
             services.Configure<OutOfProcessNodeJSServiceOptions>(options => config.ConfigureOutOfProcessNodeJSServiceOptions?.Invoke(options));
 
             services.Replace(new ServiceDescriptor(
-                typeof(INodeJSService),
-                typeof(HttpNodeJSService), 
+                typeof(IJsonService),
+                typeof(CustomJsonService), 
                 ServiceLifetime.Singleton));
 
             services.AddScoped<IReactScopedContext, ReactScopedContext>();

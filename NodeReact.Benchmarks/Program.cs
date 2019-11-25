@@ -17,7 +17,7 @@ namespace NodeReact.Benchmarks
             //}
 
 
-           // BenchmarkRunner.Run<SingleComponentBenchmark>();
+            BenchmarkRunner.Run<SingleComponentBenchmark>();
             BenchmarkRunner.Run<WebSimulateBenchmark>();
             Console.ReadKey();
 		}

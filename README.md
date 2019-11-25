@@ -1,11 +1,11 @@
 # NodeReact.NET [![NuGet Version](https://img.shields.io/nuget/v/NodeReact.svg)](https://www.nuget.org/packages/NodeReact/) 
+Library to render React library components on the server-side with C# as well as on the client.
 
-Aalternative to [ReactJS.NET](https://github.com/reactjs/React.NET) with rendering in separated node.js process
-
+# Migration from ReactJS.NET
+ReactJS.NET api is almost completely compatible except
 * Not supported On-the-fly JSX to JavaScript compilation (only AddScriptWithoutTransform)
 * Not supported render functions (ReactJS.NET v4 feature)
 
-# Migration from ReactJS.NET
 1. Make sure you use @await Html.PartialAsync and @await Html.RenderAsync on cshtml views, synchronous calls can deadlock application 
 2. Replace 
 * @Html.React to @await Html.ReactAsync

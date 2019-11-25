@@ -54,9 +54,9 @@ namespace NodeReact
 
         /// <summary>
         /// Gets or sets the maximum number of times an engine can be reused before it is disposed.
-        /// <c>0</c> is unlimited. Defaults to <c>100</c>.
+        /// <c>0</c> is unlimited. Defaults to <c>0</c>.
         /// </summary>
-        public int MaxUsagesPerEngine { get; set; } = 100;
+        public int MaxUsagesPerEngine { get; set; } = 0;
 
         /// <summary>
         /// Gets or sets whether to use the debug version of React. This is slower, but gives

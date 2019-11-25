@@ -13,7 +13,7 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.0.0" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="React.Core" Version="5.1.1" />
+    <PackageReference Include="React.Core" Version="5.1.2" />
     <PackageReference Include="ZeroReact" Version="1.0.0" />
   </ItemGroup>
   <ItemGroup>

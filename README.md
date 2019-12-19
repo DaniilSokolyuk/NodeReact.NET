@@ -39,37 +39,38 @@ services.AddNodeReact(
 Single Component
 ``` ini
 
-BenchmarkDotNet=v0.12.0, OS=Windows 10.0.17763.475 (1809/October2018Update/Redstone5)
-Intel Core i7-7700 CPU 3.60GHz (Kaby Lake), 1 CPU, 8 logical and 4 physical cores
-.NET Core SDK=3.0.100
-  [Host] : .NET Core 3.0.0 (CoreCLR 4.700.19.46205, CoreFX 4.700.19.46214), X64 RyuJIT
+BenchmarkDotNet=v0.12.0, OS=Windows 10.0.17763.864 (1809/October2018Update/Redstone5)
+Intel Core i7-8750H CPU 2.20GHz (Coffee Lake), 1 CPU, 12 logical and 6 physical cores
+.NET Core SDK=3.1.100
+  [Host]     : .NET Core 3.1.0 (CoreCLR 4.700.19.56402, CoreFX 4.700.19.56404), X64 RyuJIT
+  DefaultJob : .NET Core 3.1.0 (CoreCLR 4.700.19.56402, CoreFX 4.700.19.56404), X64 RyuJIT
 
-Job=InProcess  Toolchain=InProcessEmitToolchain  
 
 ```
 |                       Method |     Mean |    Error |   StdDev |   Median | Gen 0 | Gen 1 | Gen 2 |  Allocated |
 |----------------------------- |---------:|---------:|---------:|---------:|------:|------:|------:|-----------:|
-| NodeReact_RenderRouterSingle | 25.52 ms | 0.742 ms | 2.186 ms | 25.48 ms |     - |     - |     - |   10.09 KB |
-|       NodeReact_RenderSingle | 24.52 ms | 0.596 ms | 1.720 ms | 24.41 ms |     - |     - |     - |   10.41 KB |
-|       ZeroReact_RenderSingle | 48.26 ms | 2.493 ms | 7.031 ms | 47.95 ms |     - |     - |     - |    4.73 KB |
-| ZeroReact_RenderRouterSingle | 50.14 ms | 1.335 ms | 3.632 ms | 48.97 ms |     - |     - |     - |     7.4 KB |
-|         ReactJs_RenderSingle | 54.96 ms | 1.856 ms | 5.174 ms | 54.33 ms |     - |     - |     - | 1305.15 KB |
+| NodeReact_RenderRouterSingle | 22.10 ms | 0.498 ms | 1.460 ms | 22.14 ms |     - |     - |     - |   10.15 KB |
+|       NodeReact_RenderSingle | 21.79 ms | 0.508 ms | 1.490 ms | 21.76 ms |     - |     - |     - |   10.23 KB |
+| ZeroReact_RenderRouterSingle | 47.90 ms | 2.089 ms | 5.787 ms | 46.18 ms |     - |     - |     - |     7.4 KB |
+|       ZeroReact_RenderSingle | 42.75 ms | 2.475 ms | 6.900 ms | 42.10 ms |     - |     - |     - |    4.73 KB |
+|         ReactJs_RenderSingle | 50.19 ms | 1.149 ms | 3.277 ms | 50.89 ms |     - |     - |     - | 1305.15 KB |
+
 
 
 Web Simulation (20 parallel req., 2 components per request)
 ``` ini
 
-BenchmarkDotNet=v0.12.0, OS=Windows 10.0.17763.475 (1809/October2018Update/Redstone5)
-Intel Core i7-7700 CPU 3.60GHz (Kaby Lake), 1 CPU, 8 logical and 4 physical cores
-.NET Core SDK=3.0.100
-  [Host] : .NET Core 3.0.0 (CoreCLR 4.700.19.46205, CoreFX 4.700.19.46214), X64 RyuJIT
+BenchmarkDotNet=v0.12.0, OS=Windows 10.0.17763.864 (1809/October2018Update/Redstone5)
+Intel Core i7-8750H CPU 2.20GHz (Coffee Lake), 1 CPU, 12 logical and 6 physical cores
+.NET Core SDK=3.1.100
+  [Host]     : .NET Core 3.1.0 (CoreCLR 4.700.19.56402, CoreFX 4.700.19.56404), X64 RyuJIT
+  DefaultJob : .NET Core 3.1.0 (CoreCLR 4.700.19.56402, CoreFX 4.700.19.56404), X64 RyuJIT
 
-Job=InProcess  Toolchain=InProcessEmitToolchain  
 
 ```
-|                   Method |     Mean |    Error |    StdDev |     Gen 0 |     Gen 1 |     Gen 2 |   Allocated |
-|------------------------- |---------:|---------:|----------:|----------:|----------:|----------:|------------:|
-|  NodeReact_WebSimulation | 252.7 ms |  5.61 ms |  13.10 ms |         - |         - |         - |   418.76 KB |
-|  ZeroReact_WebSimulation | 445.5 ms | 10.18 ms |  29.52 ms |         - |         - |         - |  1257.36 KB |
-| ReactJSNet_WebSimulation | 909.4 ms | 52.93 ms | 154.40 ms | 8000.0000 | 6000.0000 | 5000.0000 | 71924.75 KB |
+|                   Method |     Mean |    Error |   StdDev |     Gen 0 |     Gen 1 |     Gen 2 |   Allocated |
+|------------------------- |---------:|---------:|---------:|----------:|----------:|----------:|------------:|
+|  NodeReact_WebSimulation | 203.9 ms |  4.10 ms |  7.70 ms |         - |         - |         - |   416.34 KB |
+|  ZeroReact_WebSimulation | 423.1 ms | 11.05 ms | 31.90 ms |         - |         - |         - |   376.23 KB |
+| ReactJSNet_WebSimulation | 589.7 ms | 25.05 ms | 73.86 ms | 5000.0000 | 3000.0000 | 2000.0000 | 63152.93 KB |
 

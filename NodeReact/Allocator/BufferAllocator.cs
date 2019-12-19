@@ -1,12 +1,7 @@
-﻿using System;
-using System.Buffers;
-using System.Runtime.CompilerServices;
+﻿using System.Buffers;
 
 namespace NodeReact.Allocator
 {
-    /// <summary>
-    /// Inspired by https://github.com/SixLabors/Core/blob/master/src/SixLabors.Core/Memory/ArrayPoolMemoryAllocator.Buffer%7BT%7D.cs
-    /// </summary>
     internal class BufferAllocator
     {
         public static BufferAllocator Instance = new BufferAllocator();
@@ -16,23 +11,26 @@ namespace NodeReact.Allocator
             InitArrayPools();
         }
 
-        private ArrayPool<byte> arrayPool;
+        private ArrayPool<char> arrayCharPool;
+        private ArrayPool<byte> arrayBytePool;
 
-        public IMemoryOwner<T> Allocate<T>(int length) where T : struct
+
+        public IMemoryOwner<char> AllocateChar(int length)
         {
-            int itemSizeBytes = Unsafe.SizeOf<T>();
-            int bufferSizeInBytes = length * itemSizeBytes;
-            if (bufferSizeInBytes < 0)
-            {
-                throw new ArgumentOutOfRangeException(
-                    nameof(length),
-                    $"{nameof(BufferAllocator)} can not allocate {length} elements of {typeof(T).Name}.");
-            }
+            ArrayPool<char> pool = length > 8192 ? arrayCharPool : ArrayPool<char>.Shared;
+            char[] charArray = pool.Rent(length);
 
-            ArrayPool<byte> pool = bufferSizeInBytes > 8192 ? arrayPool : ArrayPool<byte>.Shared;
-            byte[] byteArray = pool.Rent(bufferSizeInBytes);
+            var buffer = new PooledBuffer<char>(charArray, length, pool);
 
-            var buffer = new PooledBuffer<T>(byteArray, length, pool);
+            return buffer;
+        }
+
+        public IMemoryOwner<byte> AllocateByte(int length)
+        {
+            ArrayPool<byte> pool = length > 8192 ? arrayBytePool : ArrayPool<byte>.Shared;
+            byte[] charArray = pool.Rent(length);
+
+            var buffer = new PooledBuffer<byte>(charArray, length, pool);
 
             return buffer;
         }
@@ -40,7 +38,8 @@ namespace NodeReact.Allocator
 
         private void InitArrayPools()
         {
-            arrayPool = ArrayPool<byte>.Create(128 * 1024 * 1024, 64);
+            arrayBytePool = ArrayPool<byte>.Create(128 * 1024 * 1024, 64);
+            arrayCharPool = ArrayPool<char>.Create(128 * 1024 * 1024, 64);
         }
     }
 }

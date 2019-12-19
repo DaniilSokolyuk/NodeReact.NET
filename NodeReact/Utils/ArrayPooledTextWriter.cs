@@ -137,7 +137,7 @@ namespace NodeReact.Utils
         {
             var length = Length;
 
-            var charBuffer = BufferAllocator.Instance.Allocate<char>(length);
+            var charBuffer = BufferAllocator.Instance.AllocateChar(length);
             var spanBuffer = charBuffer.Memory.Span;
 
             int index = 0;

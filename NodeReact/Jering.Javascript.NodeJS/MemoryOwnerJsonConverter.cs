@@ -38,7 +38,7 @@ namespace NodeReact
 
                 Span<byte> utf8Unescaped = span.Length <= 256 ?
                     stackalloc byte[span.Length] :
-                    (unescapedArray = BufferAllocator.Instance.Allocate<byte>(span.Length)).Memory.Span;
+                    (unescapedArray = BufferAllocator.Instance.AllocateByte(span.Length)).Memory.Span;
 
                 JsonReaderHelperUnescape(span, utf8Unescaped, idx, out var written);
 
@@ -57,7 +57,7 @@ namespace NodeReact
         private static IMemoryOwner<char> TranscodeHelper(ReadOnlySpan<byte> source)
         {
             int maxCharsCount = Encoding.UTF8.GetCharCount(source);
-            var buffer = BufferAllocator.Instance.Allocate<char>(maxCharsCount);
+            var buffer = BufferAllocator.Instance.AllocateChar(maxCharsCount);
             Encoding.UTF8.GetChars(source, buffer.Memory.Span);
             return buffer;
         }

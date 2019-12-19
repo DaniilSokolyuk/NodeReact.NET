@@ -1,60 +1,39 @@
 ﻿using System;
 using System.Buffers;
-using System.Runtime.InteropServices;
 
 namespace NodeReact.Allocator
 {
-    internal sealed class PooledBuffer<T> : MemoryManager<T> where T : struct
+    internal sealed class PooledBuffer<T> : IMemoryOwner<T> where T : struct
     {
-        private WeakReference<ArrayPool<byte>> _sourcePoolReference;
-        private byte[] _data;
-        private readonly int _length;
-        private GCHandle pinHandle;
+        private WeakReference<ArrayPool<T>> _sourcePoolReference;
 
-        public PooledBuffer(byte[] data, int length, ArrayPool<byte> sourcePool)
+        public T[] Data { get; private set; }
+
+        public int Length { get; }
+
+        public PooledBuffer(T[] data, int length, ArrayPool<T> sourcePool)
         {
-            _data = data;
-            _length = length;
-            _sourcePoolReference = new WeakReference<ArrayPool<byte>>(sourcePool);
+            Data = data;
+            Length = length;
+            _sourcePoolReference = new WeakReference<ArrayPool<T>>(sourcePool);
         }
 
-        public override unsafe MemoryHandle Pin(int elementIndex = 0)
+        public void Dispose()
         {
-            if (!pinHandle.IsAllocated)
-            {
-                pinHandle = GCHandle.Alloc(_data, GCHandleType.Pinned);
-            }
-
-            void* ptr = (void*)pinHandle.AddrOfPinnedObject();
-            return new MemoryHandle(ptr, pinHandle);
-        }
-
-        /// <inheritdoc />
-        public override void Unpin()
-        {
-            if (pinHandle.IsAllocated)
-            {
-                pinHandle.Free();
-            }
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (!disposing || _data is null || _sourcePoolReference is null)
+            if (Data is null || _sourcePoolReference is null)
             {
                 return;
             }
 
-            if (_sourcePoolReference.TryGetTarget(out ArrayPool<byte> pool))
+            if (_sourcePoolReference.TryGetTarget(out ArrayPool<T> pool))
             {
-                pool.Return(_data);
+                pool.Return(Data);
             }
 
             _sourcePoolReference = null;
-            _data = null;
+            Data = null;
         }
 
-        public override Span<T> GetSpan() => MemoryMarshal.Cast<byte, T>(_data.AsSpan()).Slice(0, _length);
-
+        public Memory<T> Memory => new Memory<T>(Data, 0, Length);
     }
 }

@@ -19,10 +19,10 @@ namespace NodeReact
     public class NodeInvocationService : INodeInvocationService
     {
         internal static readonly string MODULE_CACHE_IDENTIFIER = typeof(NodeInvocationService).Namespace;
+        internal static readonly string BUNDLENAME = "bundle.js";
 
         private readonly IEmbeddedResourcesService _embeddedResourcesService;
         private readonly INodeJSService _nodeJsService;
-        private readonly string _bundleName;
 
 
         public NodeInvocationService(
@@ -34,7 +34,6 @@ namespace NodeReact
         {
             _nodeJsService = nodeJsService;
             _embeddedResourcesService = embeddedResourcesService;
-            _bundleName = configuration.UseDebugReact ? "interopBundle" : "interopBundleMin";
 
             using (IServiceScope scope = serviceScopeFactory.CreateScope())
             {
@@ -60,22 +59,16 @@ namespace NodeReact
             }
         }
 
-        public async Task<T> Invoke<T>(string function, IMemoryOwner<char> code, CancellationToken cancellationToken = default)
+        public Task<T> Invoke<T>(string function, IMemoryOwner<char> code, CancellationToken cancellationToken = default)
         {
             var args = new object[] { code };
 
-            // Invoke from cache
-            (bool success, T result) = await _nodeJsService.TryInvokeFromCacheAsync<T>(MODULE_CACHE_IDENTIFIER, function, args, cancellationToken);
-            if (success)
-            {
-                return result;
-            }
-
-            using (Stream moduleStream = _embeddedResourcesService.ReadAsStream(GetType().Assembly, _bundleName))
-            {
-                return await _nodeJsService.InvokeFromStreamAsync<T>(moduleStream, MODULE_CACHE_IDENTIFIER, function, args, cancellationToken);
-            }
-
+            return _nodeJsService.InvokeFromStreamAsync<T>(
+                () => _embeddedResourcesService.ReadAsStream(GetType().Assembly, BUNDLENAME),
+                MODULE_CACHE_IDENTIFIER, 
+                function, 
+                args, 
+                cancellationToken);
         }
     }
 }

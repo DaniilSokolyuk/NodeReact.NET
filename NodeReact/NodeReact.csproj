@@ -7,27 +7,15 @@
         <PackageTags>react, reactjs, nodejs</PackageTags>
         <Authors>Daniil Sokolyuk</Authors>
 
-        <VersionPrefix>1.0.4</VersionPrefix>
+        <VersionPrefix>1.0.5</VersionPrefix>
 
         <PackageProjectUrl>https://github.com/DaniilSokolyuk/NodeReact.NET</PackageProjectUrl>
         <RepositoryUrl>https://github.com/DaniilSokolyuk/NodeReact.NET</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
-
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
-
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
-
-    <ItemGroup>
-        <None Remove="Resources\interop.generated.js" />
-        <None Remove="Resources\interop.generated.min.js" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <EmbeddedResource Include="Resources\interop.generated.js" LogicalName="interopBundle" />
-        <EmbeddedResource Include="Resources\interop.generated.min.js" LogicalName="interopBundleMin" />
-    </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp2.1'">
         <PackageReference Include="Microsoft.AspNetCore.Mvc.ViewFeatures" Version="2.1.0" />
@@ -42,8 +30,30 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Jering.Javascript.NodeJS" Version="5.0.0" />
+        <PackageReference Include="Jering.Javascript.NodeJS" Version="5.3.0" />
         <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+
+        <PackageReference Include="Yarn.MSBuild" Version="1.16.0" PrivateAssets="all" ExcludeAssets="Runtime">
+            <IncludeAssets>compile; build; native; contentfiles; analyzers</IncludeAssets>
+        </PackageReference>
     </ItemGroup>
+
+    <PropertyGroup>
+        <BundleName>bundle.js</BundleName>
+        <!-- Exclude Javascript\bin and Javascript\node_modules from project - https://github.com/dotnet/cli/issues/7525 -->
+        <DefaultItemExcludes>Javascript\bin\**;Javascript\node_modules\**;$(DefaultItemExcludes)</DefaultItemExcludes>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <JavascriptInputs Include="Javascript\**" Exclude="$(DefaultItemExcludes)" />
+        <JavascriptOutputs Include="Javascript\bin\$(Configuration)\$(BundleName)" />
+        <!-- If any file in JavascriptInputs has changed, fast up-to-date check must indicate that a rebuild is required - https://github.com/dotnet/project-system/pull/2241 -->
+        <UpToDateCheckInput Include="@(JavascriptInputs)" />
+        <EmbeddedResource Include="@(JavascriptOutputs)" LogicalName="$(BundleName)" />
+    </ItemGroup>
+
+    <Target Name="JavascriptBuild" BeforeTargets="DispatchToInnerBuilds;PreBuildEvent" Inputs="@(JavascriptInputs)" Outputs="@(JavascriptOutputs)">
+        <Yarn WorkingDirectory=".\Javascript" Command="run build --env.mode=$(Configuration) --env.bundleName=$(BundleName)" />
+    </Target>
 
 </Project>

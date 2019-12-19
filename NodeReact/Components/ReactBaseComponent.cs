@@ -4,6 +4,7 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using Jering.Javascript.NodeJS;
 using Newtonsoft.Json;
+using NodeReact.Allocator;
 using NodeReact.Utils;
 
 namespace NodeReact.Components
@@ -151,11 +152,11 @@ namespace NodeReact.Components
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void WriteSpan(TextWriter viewWriter, IMemoryOwner<char> owner)
         {
-            //if (owner is PooledCharBuffer buffer)
-            //{
-            //    viewWriter.Write(buffer._array, 0, buffer._length);
-            //}
-            //else
+            if (owner is PooledBuffer<char> buffer)
+            {
+                viewWriter.Write(buffer.Data, 0, buffer.Length);
+            }
+            else
             {
                 viewWriter.Write(owner.Memory.Span);
             }

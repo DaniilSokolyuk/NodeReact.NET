@@ -3,6 +3,10 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+#Custom
+/NodeReact.Sample.Webpack.AspNetCore/wwwroot/client.bundle.js
+/NodeReact.Sample.Webpack.AspNetCore/wwwroot/server.bundle.js
+
 # User-specific files
 *.rsuser
 *.suo

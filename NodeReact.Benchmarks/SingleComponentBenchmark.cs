@@ -43,41 +43,6 @@ namespace NodeReact.Benchmarks
                 component.WriteOutputHtmlTo(tk);
             }
         }
-        
-        [Benchmark]
-        public async Task ZeroReact_RenderRouterSingle()
-        {
-            using (var scope = sp.CreateScope())
-            {
-                var reactContext = scope.ServiceProvider.GetRequiredService<ZeroReact.IReactScopedContext>();
-
-                var component = reactContext.CreateComponent<ZeroReact.Components.ReactRouterComponent>("__desktopComponents.App");
-                component.Props = _testData;
-                component.ServerOnly = true;
-                component.Path = "/movie/246436/";
-
-                await component.RenderRouterWithContext();
-
-                component.WriteOutputHtmlTo(tk);
-            }
-        }
-
-        [Benchmark]
-        public async Task ZeroReact_RenderSingle()
-        {
-            using (var scope = sp.CreateScope())
-            {
-                var reactContext = scope.ServiceProvider.GetRequiredService<ZeroReact.IReactScopedContext>();
-
-                var component = reactContext.CreateComponent<ZeroReact.Components.ReactComponent>("__components.MovieAboutPage");
-                component.Props = _testData;
-                component.ServerOnly = true;
-
-                await component.RenderHtml();
-
-                component.WriteOutputHtmlTo(tk);
-            }
-        }
 
         [Benchmark]
         public void ReactJs_RenderSingle()

@@ -30,10 +30,10 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Jering.Javascript.NodeJS" Version="5.3.0" />
+        <PackageReference Include="Jering.Javascript.NodeJS" Version="5.4.3" />
         <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
 
-        <PackageReference Include="Yarn.MSBuild" Version="1.16.0" PrivateAssets="all" ExcludeAssets="Runtime">
+        <PackageReference Include="Yarn.MSBuild" Version="1.22.10" PrivateAssets="all" ExcludeAssets="Runtime">
             <IncludeAssets>compile; build; native; contentfiles; analyzers</IncludeAssets>
         </PackageReference>
     </ItemGroup>

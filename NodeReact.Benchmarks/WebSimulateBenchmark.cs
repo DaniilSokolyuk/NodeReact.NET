@@ -37,33 +37,6 @@ namespace NodeReact.Benchmarks
             await Task.WhenAll(tasks);
         }
 
-
-        [Benchmark]
-        public async Task ZeroReact_WebSimulation()
-        {
-            var tasks = Enumerable.Range(0, 20).Select(async x =>
-            {
-                using (var scope = sp.CreateScope())
-                {
-                    foreach (var ind in Enumerable.Range(0, 2))
-                    {
-                        var reactContext = scope.ServiceProvider.GetRequiredService<ZeroReact.IReactScopedContext>();
-
-                        var component = reactContext.CreateComponent<ZeroReact.Components.ReactComponent>("__components.MovieAboutPage");
-                        component.Props = _testData;
-
-                        await component.RenderHtml();
-
-                        component.WriteOutputHtmlTo(tk);
-                    }
-
-                    scope.ServiceProvider.GetRequiredService<ZeroReact.IReactScopedContext>().GetInitJavaScript(tk);
-                }
-            });
-
-            await Task.WhenAll(tasks);
-        }
-
         [Benchmark]
         public void ReactJSNet_WebSimulation()
         {

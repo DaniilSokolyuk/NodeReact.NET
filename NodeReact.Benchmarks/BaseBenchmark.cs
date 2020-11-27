@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using BenchmarkDotNet.Attributes;
-using JavaScriptEngineSwitcher.ChakraCore;
 using JavaScriptEngineSwitcher.Core;
+using JavaScriptEngineSwitcher.V8;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
 using React;
-using ZeroReact;
 
 namespace NodeReact.Benchmarks
 {
@@ -31,16 +30,6 @@ namespace NodeReact.Benchmarks
 		{
 			var services = new ServiceCollection();
 
-			services.AddZeroReactCore(
-				config =>
-				{
-					config.AddScriptWithoutTransform("hugeBundle.js");
-					config.StartEngines = Environment.ProcessorCount;
-					config.MaxEngines = Environment.ProcessorCount;
-                    config.MaxUsagesPerEngine = int.MaxValue;
-					config.AllowJavaScriptPrecompilation = false;
-				});
-
             services.AddNodeReact(
                 config =>
                 {
@@ -60,8 +49,8 @@ namespace NodeReact.Benchmarks
 			AssemblyRegistration.Container.Register<global::React.IFileSystem, global::NodeReact.Benchmarks.React.PhysicalFileSystem>();
 			AssemblyRegistration.Container.Register<IReactEnvironment, ReactEnvironment>().AsMultiInstance();
 
-			JsEngineSwitcher.Current.EngineFactories.Add(new ChakraCoreJsEngineFactory());
-			JsEngineSwitcher.Current.DefaultEngineName = ChakraCoreJsEngine.EngineName;
+			JsEngineSwitcher.Current.EngineFactories.Add(new V8JsEngineFactory());
+            JsEngineSwitcher.Current.DefaultEngineName = V8JsEngine.EngineName;
 
 			var configuration = ReactSiteConfiguration.Configuration;
 			configuration

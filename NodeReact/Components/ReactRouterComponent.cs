@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Buffers;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using NodeReact.Utils;
 
 namespace NodeReact.Components
@@ -56,9 +57,9 @@ namespace NodeReact.Components
                 textWriter.Write(ComponentName);
                 textWriter.Write(",Object.assign(");
                 WriterSerialziedProps(textWriter);
-                textWriter.Write(",{location:\"");
-                textWriter.Write(Path);
-                textWriter.Write("\",context:context})))");
+                textWriter.Write(",{location:");
+                textWriter.Write(JsonConvert.SerializeObject(Path, _configuration.JsonSerializerSettings));
+                textWriter.Write(",context:context})))");
 
                 textWriter.Write("})");
 

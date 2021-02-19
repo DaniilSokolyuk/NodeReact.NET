@@ -1,20 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <LangVersion>7.1</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="BenchmarkDotNet" Version="0.12.0" />
-    <PackageReference Include="JavaScriptEngineSwitcher.ChakraCore.Native.linux-x64" Version="3.2.3" />
-    <PackageReference Include="JavaScriptEngineSwitcher.ChakraCore.Native.osx-x64" Version="3.2.3" />
-    <PackageReference Include="JavaScriptEngineSwitcher.ChakraCore.Native.win-x86" Version="3.2.3" />
-    <PackageReference Include="JavaScriptEngineSwitcher.ChakraCore.Native.win-x64" Version="3.2.3" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.0.0" />
+    <PackageReference Include="BenchmarkDotNet" Version="0.12.1" />
+    <PackageReference Include="JavaScriptEngineSwitcher.V8" Version="3.10.0" />
+    <PackageReference Include="JavaScriptEngineSwitcher.V8.Native.win-x64" Version="3.10.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.0" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="React.Core" Version="5.1.2" />
-    <PackageReference Include="ZeroReact" Version="1.0.0" />
+    <PackageReference Include="React.Core" Version="5.2.11" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NodeReact\NodeReact.csproj" />

@@ -12,7 +12,7 @@ namespace NodeReact.Components
     public abstract class ReactBaseComponent : IDisposable
     {
         protected readonly INodeInvocationService _nodeInvocationService;
-        private readonly ReactConfiguration _configuration;
+        protected readonly ReactConfiguration _configuration;
         private readonly IReactIdGenerator _reactIdGenerator;
         private readonly IComponentNameInvalidator _componentNameInvalidator;
 

@@ -10,6 +10,14 @@ namespace NodeReact
     /// </summary>
     public class ReactConfiguration
     {
+        public ReactConfiguration()
+        {
+            SetJsonSerializerSettings(new JsonSerializerSettings
+            {
+                StringEscapeHandling = StringEscapeHandling.EscapeHtml
+            });
+        }
+
         /// <summary>
         /// All the scripts that have been added to this configuration 
         /// </summary>
@@ -21,15 +29,14 @@ namespace NodeReact
             return this;
         }
 
-        internal JsonSerializer Serializer = JsonSerializer.Create(
-            new JsonSerializerSettings
-            {
-                StringEscapeHandling = StringEscapeHandling.EscapeHtml
-            });
+        internal JsonSerializerSettings JsonSerializerSettings;
+
+        internal JsonSerializer Serializer;
 
         public ReactConfiguration SetJsonSerializerSettings(JsonSerializerSettings settings)
         {
-            Serializer = JsonSerializer.Create(settings);
+            JsonSerializerSettings = settings;
+            Serializer = JsonSerializer.Create(JsonSerializerSettings);
             return this;
         }
 

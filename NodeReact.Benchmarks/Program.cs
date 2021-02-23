@@ -8,13 +8,13 @@ namespace NodeReact.Benchmarks
 	{
 		public static async Task Main(string[] args)
 		{
-            //var tt = new SingleComponentBenchmark();
-            //tt.Setup();
+            var tt = new SingleComponentBenchmark();
+            tt.Setup();
 
-            //for (int i = 0; i < 10000000; i++)
-            //{
-            //    await tt.NodeReact_RenderRouterSingle();
-            //}
+            for (int i = 0; i < 10000000; i++)
+            {
+                tt.ReactJs_RenderSingle();
+            }
 
 
             BenchmarkRunner.Run<SingleComponentBenchmark>();

@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Buffers;
-using System.Reflection;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using NodeReact.Allocator;
-using NodeReact.Utils;
 
 namespace NodeReact
 {
@@ -33,8 +30,7 @@ namespace NodeReact
             
             return buffer;
         }
-
-
+        
         public override void Write(Utf8JsonWriter writer, IMemoryOwner<char> value, JsonSerializerOptions options)
         {
             writer.WriteStringValue(value.Memory.Span);

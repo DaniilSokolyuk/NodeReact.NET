@@ -14,7 +14,6 @@ namespace NodeReact.Allocator
         private ArrayPool<char> arrayCharPool;
         private ArrayPool<byte> arrayBytePool;
 
-
         public IMemoryOwner<char> AllocateChar(int length)
         {
             ArrayPool<char> pool = length > 8192 ? arrayCharPool : ArrayPool<char>.Shared;

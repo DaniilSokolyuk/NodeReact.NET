@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using Jering.Javascript.NodeJS;
@@ -16,10 +17,10 @@ namespace NodeReact.Jering.Javascript.NodeJS
         {
             Converters = { new MemoryOwnerJsonConverter()},
             DefaultBufferSize = 64536,
-
+            
             Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            IgnoreNullValues = true,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
             PropertyNameCaseInsensitive = true
         };
 

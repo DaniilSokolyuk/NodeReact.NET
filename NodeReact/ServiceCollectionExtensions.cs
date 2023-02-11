@@ -30,7 +30,10 @@ namespace NodeReact
                 options.EnvironmentVariables.Add("NODEREACT_MAXWORKERS", config.MaxEngines.ToString());
                 options.EnvironmentVariables.Add("NODEREACT_MAXUSAGESPERFWORKER", config.MaxUsagesPerEngine.ToString());
             });
-            services.Configure<OutOfProcessNodeJSServiceOptions>(options => config.ConfigureOutOfProcessNodeJSServiceOptions?.Invoke(options));
+            services.Configure<OutOfProcessNodeJSServiceOptions>(options =>
+            {
+                config.ConfigureOutOfProcessNodeJSServiceOptions?.Invoke(options);
+            });
 
             services.Replace(new ServiceDescriptor(
                 typeof(IJsonService),

@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>netcoreapp2.1;netcoreapp2.2;netcoreapp3.0;net5.0</TargetFrameworks>
+        <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
 
         <Description>Library to render React library components on the server-side with C# as well as on the client.</Description>
         <PackageTags>react, reactjs, nodejs</PackageTags>
         <Authors>Daniil Sokolyuk</Authors>
 
-        <VersionPrefix>1.0.6</VersionPrefix>
+        <VersionPrefix>2.0.0</VersionPrefix>
 
         <PackageProjectUrl>https://github.com/DaniilSokolyuk/NodeReact.NET</PackageProjectUrl>
         <RepositoryUrl>https://github.com/DaniilSokolyuk/NodeReact.NET</RepositoryUrl>
@@ -16,25 +16,17 @@
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
-
-    <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp2.1'">
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.ViewFeatures" Version="2.1.0" />
-    </ItemGroup>
-
-    <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp2.2'">
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.ViewFeatures" Version="2.2.0" />
-    </ItemGroup>
-
-    <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp3.0'">
+    
+    <ItemGroup Condition="'$(TargetFramework)'=='net6.0'">
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
     </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'=='net5.0'">
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
-  </ItemGroup>
+    <ItemGroup Condition="'$(TargetFramework)'=='net7.0'">
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Jering.Javascript.NodeJS" Version="5.4.4" />
+        <PackageReference Include="Jering.Javascript.NodeJS" Version="7.0.0-beta.2" />
         <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
 
         <PackageReference Include="Yarn.MSBuild" Version="1.22.10" PrivateAssets="all" ExcludeAssets="Runtime">

@@ -7,14 +7,17 @@
     "watch": "webpack --watch"
   },
   "devDependencies": {
-    "temp-write": "4.0.0",
-    "workerpool": "5.0.2",
     "filewatcher": "3.0.1",
     "prop-types": "15.7.2",
-    "react": "16.8.6",
-    "react-dom": "16.8.6",
+    "raw-loader": "4.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "temp-write": "4.0.0",
     "webpack": "^4.41.2",
     "webpack-cli": "^3.3.10",
-    "raw-loader": "4.0.0" 
+    "workerpool": "6.3.1"
+  },
+  "dependencies": {
+    "fsevents": "^2.3.2"
   }
 }

@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using Jering.Javascript.NodeJS;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -30,11 +33,15 @@ namespace NodeReact
             {
                 options.Concurrency = Concurrency.MultiProcess;
                 options.ConcurrencyDegree = config.EnginesCount;
-
-                options.EnableFileWatching = true;
-                options.WatchFileNamePatterns = new[] { "*.js", "*.jsx", "*.ts", "*.tsx" };
-                options.WatchSubdirectories = true;
                 
+                if (config.UseDebugReact)
+                {
+                    options.EnableFileWatching = true;
+                    var fw = config.ScriptFilesWithoutTransform.Select(Path.GetFileName).Distinct().ToArray();
+                    options.WatchFileNamePatterns = fw;
+                    options.WatchSubdirectories = true;
+                }
+
                 config.ConfigureOutOfProcessNodeJSServiceOptions?.Invoke(options);
             });
 

@@ -25,13 +25,16 @@ namespace NodeReact
             services.Configure<NodeJSProcessOptions>(options =>
             {
                 config.ConfigureNodeJSProcessOptions?.Invoke(options);
-
-                options.EnvironmentVariables.Add("NODEREACT_MINWORKERS", config.StartEngines.ToString());
-                options.EnvironmentVariables.Add("NODEREACT_MAXWORKERS", config.MaxEngines.ToString());
-                options.EnvironmentVariables.Add("NODEREACT_MAXUSAGESPERFWORKER", config.MaxUsagesPerEngine.ToString());
             });
             services.Configure<OutOfProcessNodeJSServiceOptions>(options =>
             {
+                options.Concurrency = Concurrency.MultiProcess;
+                options.ConcurrencyDegree = config.EnginesCount;
+
+                options.EnableFileWatching = true;
+                options.WatchFileNamePatterns = new[] { "*.js", "*.jsx", "*.ts", "*.tsx" };
+                options.WatchSubdirectories = true;
+                
                 config.ConfigureOutOfProcessNodeJSServiceOptions?.Invoke(options);
             });
 

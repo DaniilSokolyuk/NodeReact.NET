@@ -48,22 +48,10 @@ namespace NodeReact
         public Action<OutOfProcessNodeJSServiceOptions> ConfigureOutOfProcessNodeJSServiceOptions { get; set; }
 
         /// <summary>
-        /// Gets or sets the number of engines to initially start when a pool is created. 
-        /// Defaults to <c>Math.Max(Environment.ProcessorCount - 1, 1)</c>.
-        /// </summary>
-        public int StartEngines { get; set; } = Math.Max(Environment.ProcessorCount - 1, 1);
-
-        /// <summary>
         /// Gets or sets the number of max engines. 
-        /// Defaults  <c>Math.Max(Environment.ProcessorCount, 2)</c>.
+        /// Defaults  <c>Math.Max(Environment.ProcessorCount - 1, 2)</c>.
         /// </summary>
-        public int MaxEngines { get; set; } = Math.Max(Environment.ProcessorCount, 2);
-
-        /// <summary>
-        /// Gets or sets the maximum number of times an engine can be reused before it is disposed.
-        /// <c>0</c> is unlimited. Defaults to <c>0</c>.
-        /// </summary>
-        public int MaxUsagesPerEngine { get; set; } = 0;
+        public int EnginesCount { get; set; } = Math.Max(Environment.ProcessorCount - 1, 1);
 
         /// <summary>
         /// Gets or sets whether to use the debug version of React. This is slower, but gives

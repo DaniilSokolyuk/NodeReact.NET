@@ -25,7 +25,7 @@ namespace NodeReact.Sample.Webpack.AspNetCore
                     config.ConfigureOutOfProcessNodeJSServiceOptions = o =>
                     {
                         o.NumRetries = 0;
-                        o.TimeoutMS = 10000;
+                        o.InvocationTimeoutMS = 2000;
                     };
                     config.AddScriptWithoutTransform("~/server.bundle.js");
                     config.UseDebugReact = true;

@@ -16,49 +16,21 @@ namespace NodeReact
             return typeof(IMemoryOwner<char>).IsAssignableFrom(type);
         }
 
-        public const byte BackSlash = (byte)'\\';
-
-        delegate void Unescape(ReadOnlySpan<byte> source, Span<byte> destination, int idx, out int written);
-
-        //https://github.com/dotnet/corefx/issues/35386
-        private static Unescape JsonReaderHelperUnescape = (Unescape)Delegate.CreateDelegate(
-            type: typeof(Unescape),
-            method: typeof(Utf8JsonReader).Assembly.GetType("System.Text.Json.JsonReaderHelper")
-                .GetMethod("Unescape", BindingFlags.NonPublic| BindingFlags.Static));
-
-
         public override IMemoryOwner<char> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            ReadOnlySpan<byte> span = reader.HasValueSequence ? reader.ValueSequence.ToArray() : reader.ValueSpan;
+            var length = reader.HasValueSequence ? (int)reader.ValueSequence.Length : reader.ValueSpan.Length;    
+            var buffer = BufferAllocator.Instance.AllocateChar(length);
+            var writen = reader.CopyString(buffer.Memory.Span);
 
-            int idx = span.IndexOf(BackSlash);
-            if (idx != -1)
+            if (writen != length)
             {
-                IMemoryOwner<byte> unescapedArray = null;
+                var newBuffer = BufferAllocator.Instance.AllocateChar(writen);
+                buffer.Memory.Span.Slice(0, writen).CopyTo(newBuffer.Memory.Span);
+                buffer.Dispose();
 
-                Span<byte> utf8Unescaped = span.Length <= 256 ?
-                    stackalloc byte[span.Length] :
-                    (unescapedArray = BufferAllocator.Instance.AllocateByte(span.Length)).Memory.Span;
-
-                JsonReaderHelperUnescape(span, utf8Unescaped, idx, out var written);
-
-                utf8Unescaped = utf8Unescaped.Slice(0, written);
-
-                var result = TranscodeHelper(utf8Unescaped);
-
-                unescapedArray?.Dispose();
-
-                return result;
+                return newBuffer;
             }
-
-            return TranscodeHelper(span);
-        }
-
-        private static IMemoryOwner<char> TranscodeHelper(ReadOnlySpan<byte> source)
-        {
-            int maxCharsCount = Encoding.UTF8.GetCharCount(source);
-            var buffer = BufferAllocator.Instance.AllocateChar(maxCharsCount);
-            Encoding.UTF8.GetChars(source, buffer.Memory.Span);
+            
             return buffer;
         }
 

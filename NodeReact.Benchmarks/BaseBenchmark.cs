@@ -33,8 +33,7 @@ namespace NodeReact.Benchmarks
             services.AddNodeReact(
                 config =>
                 {
-                    config.StartEngines = Environment.ProcessorCount;
-                    config.MaxEngines = Environment.ProcessorCount;
+                    config.EnginesCount = Environment.ProcessorCount;
 
                     config.AddScriptWithoutTransform("hugeBundle.js");
                 });

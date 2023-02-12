@@ -2,9 +2,9 @@
 using System.Buffers;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Text;
 using Jering.Javascript.NodeJS;
 using Newtonsoft.Json;
-using NodeReact.Allocator;
 using NodeReact.Utils;
 
 namespace NodeReact.Components
@@ -56,7 +56,7 @@ namespace NodeReact.Components
         /// </summary>
         public string ContainerId
         {
-            get => _containerId ?? (_containerId = _reactIdGenerator.Generate());
+            get => _containerId ??= _reactIdGenerator.Generate();
             set => _containerId = value;
         }
 
@@ -94,24 +94,22 @@ namespace NodeReact.Components
 
         public Action<Exception, string, string> ExceptionHandler { get; set; }
 
-        private IMemoryOwner<char> SerializedProps { get; set; }
+        internal PropsSerialized SerializedProps { get; set; }
         protected void WriterSerialziedProps(TextWriter writer)
         {
-            if (SerializedProps == null)
-            {
-                using (var pooledTextWriter = new ArrayPooledTextWriter())
-                using (var jsonWriter = new JsonTextWriter(pooledTextWriter))
-                {
-                    jsonWriter.CloseOutput = false;
-                    jsonWriter.AutoCompleteOnClose = false;
-                    jsonWriter.ArrayPool = JsonArrayPool<char>.Instance;
-                    _configuration.Serializer.Serialize(jsonWriter, Props);
+            SerializedProps ??= _configuration.PropsSerializer.Serialize(Props);
 
-                    SerializedProps = pooledTextWriter.GetMemoryOwner();
-                }
-            }
+            var stream = SerializedProps.Stream;
+            stream.Position = 0;
 
-            WriteSpan(writer, SerializedProps);
+            var textWriterBufferWriter = new TextWriterBufferWriter(writer);
+            
+            Encoding.UTF8.GetDecoder().Convert(
+                stream.GetReadOnlySequence(), 
+                textWriterBufferWriter, 
+                true, 
+                out _, 
+                out _);
         }
 
         protected IMemoryOwner<char> OutputHtml { get; set; }

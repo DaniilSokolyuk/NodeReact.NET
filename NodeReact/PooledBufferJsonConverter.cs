@@ -2,12 +2,14 @@
 using System.Buffers;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using NodeReact.Allocator;
+using NodeReact.Utils;
 
 namespace NodeReact
 {
-    internal class MemoryOwnerJsonConverter : JsonConverter<IMemoryOwner<char>>
+    internal class PooledCharMemoryOwnerJsonConverter : JsonConverter<IMemoryOwner<char>>
     {
+        private static MemoryPool<char> _pool = MemoryPool<char>.Shared;
+
         public override bool CanConvert(Type type)
         {
             return typeof(IMemoryOwner<char>).IsAssignableFrom(type);
@@ -16,12 +18,12 @@ namespace NodeReact
         public override IMemoryOwner<char> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             var length = reader.HasValueSequence ? (int)reader.ValueSequence.Length : reader.ValueSpan.Length;    
-            var buffer = BufferAllocator.Instance.AllocateChar(length);
+            var buffer = _pool.Rent(length);
             var writen = reader.CopyString(buffer.Memory.Span);
 
             if (writen != length)
             {
-                var newBuffer = BufferAllocator.Instance.AllocateChar(writen);
+                var newBuffer = _pool.Rent(writen);
                 buffer.Memory.Span.Slice(0, writen).CopyTo(newBuffer.Memory.Span);
                 buffer.Dispose();
 

@@ -33,7 +33,10 @@ namespace NodeReact.Components
             {
                 try
                 {
-                    var renderResult = await _nodeInvocationService.Invoke<RenderResult>("evalCode", executeEngineCode);
+                    var renderResult = await _nodeInvocationService.Invoke<RenderResult>(
+                        "evalCode", 
+                        new object[] {executeEngineCode});
+                    
                     OutputHtml = renderResult.html;
                 }
                 catch (Exception ex)

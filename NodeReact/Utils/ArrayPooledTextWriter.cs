@@ -3,11 +3,10 @@ using System.Buffers;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
-using NodeReact.Allocator;
 
 namespace NodeReact.Utils
 {
-    public sealed class ArrayPooledTextWriter : TextWriter
+    public sealed class ArrayPooledTextWriter : TextWriter, IBufferWriter<char>
     {
         private static readonly ArrayPool<char> _pagePool = ArrayPool<char>.Shared;
         private static readonly ArrayPool<char[]> _rootPool = ArrayPool<char[]>.Shared;
@@ -131,6 +130,12 @@ namespace NodeReact.Utils
 
             _rootPool.Return(_pages);
             _pages = null;
+
+            if (_bufferWritePage != null)
+            {
+                _pagePool.Return(_bufferWritePage);
+                _bufferWritePage = null;   
+            }
         }
 
         public IMemoryOwner<char> GetMemoryOwner()
@@ -162,6 +167,47 @@ namespace NodeReact.Utils
             {
                 return new string(buffer.Memory.Span);
             }
+        }
+
+        private char[] _bufferWritePage;
+        public void Advance(int count)
+        {
+            Write(_bufferWritePage.AsSpan(0, count));
+            
+            _pagePool.Return(_bufferWritePage);
+            _bufferWritePage = null;
+        }
+
+        public Memory<char> GetMemory(int sizeHint = 0)
+        {
+            try
+            {
+                _bufferWritePage = _pagePool.Rent(sizeHint);
+            }
+            catch when (_bufferWritePage != null)
+            {
+                _pagePool.Return(_bufferWritePage);
+                _bufferWritePage = null;
+                throw;
+            }
+            
+            return _bufferWritePage.AsMemory();
+        }
+
+        public Span<char> GetSpan(int sizeHint = 0)
+        {
+            try
+            {
+                _bufferWritePage = _pagePool.Rent(sizeHint);
+            }
+            catch when (_bufferWritePage != null)
+            {
+                _pagePool.Return(_bufferWritePage);
+                _bufferWritePage = null;
+                throw;
+            }
+            
+            return _bufferWritePage.AsSpan();
         }
     }
 }

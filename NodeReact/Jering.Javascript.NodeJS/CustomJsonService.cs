@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
+﻿using System.IO;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -15,7 +12,11 @@ namespace NodeReact.Jering.Javascript.NodeJS
     {
         private static readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions
         {
-            Converters = { new MemoryOwnerJsonConverter()},
+            Converters =
+            {
+                new PooledCharMemoryOwnerJsonConverter(), 
+                new PropsSerializedJsonConverter()
+            },
             DefaultBufferSize = 64536,
             
             Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,

@@ -35,7 +35,7 @@ namespace NodeReact.Components
             {
                 try
                 {
-                    RoutingContext = await _nodeInvocationService.Invoke<RoutingContext>("evalCode", executeEngineCode);
+                    RoutingContext = await _nodeInvocationService.Invoke<RoutingContext>("evalCode", new object[] {executeEngineCode});
                     OutputHtml = RoutingContext.html;
                 }
                 catch (Exception ex)
@@ -58,7 +58,7 @@ namespace NodeReact.Components
                 textWriter.Write(",Object.assign(");
                 WriterSerialziedProps(textWriter);
                 textWriter.Write(",{location:");
-                textWriter.Write(JsonConvert.SerializeObject(Path, _configuration.JsonSerializerSettings));
+                textWriter.Write(JsonConvert.SerializeObject(Path));
                 textWriter.Write(",context:context})))");
 
                 textWriter.Write("})");

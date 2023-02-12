@@ -80,7 +80,7 @@ namespace NodeReact.AspNetCore
                         }
                         else
                         {
-                            throw new ZeroReactException("Router requested redirect but no url provided.");
+                            throw new NodeReactException("Router requested redirect but no url provided.");
                         }
                     }
                     else

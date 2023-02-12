@@ -1,7 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Text.Encodings.Web;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Jering.Javascript.NodeJS;
 using Newtonsoft.Json;
+using NewtonsoftJsonSerializer = Newtonsoft.Json.JsonSerializer;
 
 namespace NodeReact
 {
@@ -12,31 +16,19 @@ namespace NodeReact
     {
         public ReactConfiguration()
         {
-            SetJsonSerializerSettings(new JsonSerializerSettings
-            {
-                StringEscapeHandling = StringEscapeHandling.EscapeHtml
-            });
+            SetSystemTextJsonPropsSerializer(_ => {});
         }
-
+        
         /// <summary>
         /// All the scripts that have been added to this configuration 
         /// </summary>
         internal readonly IList<string> ScriptFilesWithoutTransform = new List<string>();
+        
+        internal IPropsSerializer PropsSerializer { get; set; }
 
         public ReactConfiguration AddScriptWithoutTransform(string script)
         {
             ScriptFilesWithoutTransform.Add(script);
-            return this;
-        }
-
-        internal JsonSerializerSettings JsonSerializerSettings;
-
-        internal JsonSerializer Serializer;
-
-        public ReactConfiguration SetJsonSerializerSettings(JsonSerializerSettings settings)
-        {
-            JsonSerializerSettings = settings;
-            Serializer = JsonSerializer.Create(JsonSerializerSettings);
             return this;
         }
 
@@ -86,5 +78,38 @@ namespace NodeReact
                 ex.Message,
                 ContainerId
             ));
+
+        /// <summary>
+        /// Set Newtonsoft.Json serializer for React props.
+        /// </summary>
+        /// <param name="configureJsonSerializerSettings"></param>
+        public void SetNewtonsoftJsonPropsSerializer(Action<JsonSerializerSettings> configureJsonSerializerSettings)
+        {
+            var jsonSerializerSettings = new JsonSerializerSettings
+            {
+                StringEscapeHandling = StringEscapeHandling.EscapeHtml
+            };
+            
+            configureJsonSerializerSettings(jsonSerializerSettings);
+            PropsSerializer = new NewtonsoftJsonPropsSerializer(NewtonsoftJsonSerializer.Create(jsonSerializerSettings));
+        }
+        
+        /// <summary>
+        /// Set System.Text.Json serializer for React props.
+        /// </summary>
+        /// <param name="configureJsonSerializerOptions"></param>
+        public void SetSystemTextJsonPropsSerializer(Action<JsonSerializerOptions> configureJsonSerializerOptions)
+        {
+            var jsonSerializerOptions = new JsonSerializerOptions
+            {
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                PropertyNameCaseInsensitive = true,
+            };
+            
+            configureJsonSerializerOptions(jsonSerializerOptions);  
+            PropsSerializer = new SystemTextJsonPropsSerializer(jsonSerializerOptions);
+        }
     }
 }

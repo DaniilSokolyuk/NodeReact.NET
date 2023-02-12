@@ -29,6 +29,9 @@ namespace NodeReact.Sample.Webpack.AspNetCore
                     };
                     config.AddScriptWithoutTransform("~/server.bundle.js");
                     config.UseDebugReact = true;
+
+                    //config.SetSystemTextJsonPropsSerializer((_) => { });
+                    config.SetNewtonsoftJsonPropsSerializer((_) => { });
                 });
         }
 

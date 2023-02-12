@@ -13,7 +13,7 @@ namespace NodeReact
 {
     public interface INodeInvocationService
     {
-        Task<T> Invoke<T>(string function, IMemoryOwner<char> code, CancellationToken cancellationToken = default);
+        Task<T> Invoke<T>(string function, object[] args, CancellationToken cancellationToken = default);
     }
 
     public class NodeInvocationService : INodeInvocationService
@@ -59,10 +59,8 @@ namespace NodeReact
             }
         }
 
-        public Task<T> Invoke<T>(string function, IMemoryOwner<char> code, CancellationToken cancellationToken = default)
+        public Task<T> Invoke<T>(string function, object[] args, CancellationToken cancellationToken = default)
         {
-            var args = new object[] { code };
-
             return _nodeJsService.InvokeFromStreamAsync<T>(
                 () => _embeddedResourcesService.ReadAsStream(GetType().Assembly, BUNDLENAME),
                 MODULE_CACHE_IDENTIFIER, 

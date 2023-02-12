@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Buffers;
 
-namespace NodeReact.Allocator
+namespace NodeReact.Utils
 {
+    //TODO: remove
     internal sealed class PooledBuffer<T> : IMemoryOwner<T> where T : struct
     {
         private WeakReference<ArrayPool<T>> _sourcePoolReference;

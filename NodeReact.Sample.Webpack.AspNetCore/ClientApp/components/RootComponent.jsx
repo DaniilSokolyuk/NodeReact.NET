@@ -1,6 +1,4 @@
-﻿// @ts-check
-
-import React from "react";
+﻿import React from "react";
 import { Link, BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 
 import { StaticRouter } from "react-router-dom/server";

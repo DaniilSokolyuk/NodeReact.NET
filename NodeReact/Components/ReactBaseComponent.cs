@@ -171,13 +171,28 @@ namespace NodeReact.Components
         /// <returns>JavaScript</returns>
         public void RenderJavaScript(TextWriter writer)
         {
-            writer.Write(ClientOnly ? "ReactDOM.render(React.createElement(" : "ReactDOM.hydrate(React.createElement(");
-            writer.Write(ComponentName);
-            writer.Write(',');
-            WriterSerialziedProps(writer);
-            writer.Write("),document.getElementById(\"");
-            writer.Write(ContainerId);
-            writer.Write("\"))");
+            if (ClientOnly)
+            {
+                //ReactDOM.createRoot(document.getElementById("container")).render(React.createElement(HelloWorld, { name: "John" }));
+                writer.Write(ClientOnly ? "ReactDOM.createRoot(document.getElementById(\"" : "ReactDOM.hydrateRoot(document.getElementById(\"");
+                writer.Write(ContainerId);
+                writer.Write("\")).render(React.createElement(");
+                writer.Write(ComponentName);
+                writer.Write(',');
+                WriterSerialziedProps(writer);
+                writer.Write("))");
+            }
+            else
+            {
+                //ReactDOM.hydrateRoot(document.getElementById("container"), React.createElement(HelloWorld, { name: "John" }))
+                writer.Write("ReactDOM.hydrateRoot(document.getElementById(\"");
+                writer.Write(ContainerId);
+                writer.Write("\"), React.createElement(");
+                writer.Write(ComponentName);
+                writer.Write(',');
+                WriterSerialziedProps(writer);
+                writer.Write("))");
+            }
         }
 
         public virtual void Dispose()

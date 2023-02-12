@@ -17,7 +17,7 @@ namespace NodeReact.Sample.Webpack.AspNetCore
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
+            services.AddMvc().AddRazorRuntimeCompilation();
 
             services.AddNodeReact(
                 config =>

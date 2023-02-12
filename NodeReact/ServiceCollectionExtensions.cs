@@ -27,6 +27,8 @@ namespace NodeReact
             services.AddNodeJS();
             services.Configure<NodeJSProcessOptions>(options =>
             {
+                options.EnvironmentVariables.Add("NODEREACT_FILEWATCHERDEBOUNCE", config.FileWatcherDebounceMs.ToString());
+
                 config.ConfigureNodeJSProcessOptions?.Invoke(options);
             });
             services.Configure<OutOfProcessNodeJSServiceOptions>(options =>
@@ -34,14 +36,6 @@ namespace NodeReact
                 options.Concurrency = Concurrency.MultiProcess;
                 options.ConcurrencyDegree = config.EnginesCount;
                 
-                if (config.UseDebugReact)
-                {
-                    options.EnableFileWatching = true;
-                    var fw = config.ScriptFilesWithoutTransform.Select(Path.GetFileName).Distinct().ToArray();
-                    options.WatchFileNamePatterns = fw;
-                    options.WatchSubdirectories = true;
-                }
-
                 config.ConfigureOutOfProcessNodeJSServiceOptions?.Invoke(options);
             });
 

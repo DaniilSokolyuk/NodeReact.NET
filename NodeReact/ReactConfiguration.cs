@@ -71,6 +71,11 @@ namespace NodeReact
         public Func<string> ScriptNonceProvider { get; set; }
 
         /// <summary>
+        /// File watcher debounce time in milliseconds. Defaults to 10.
+        /// </summary>
+        public int FileWatcherDebounceMs { get; set; } = 10;
+
+        /// <summary>
         /// Handle an exception caught during server-render of a component.
         /// If unset, unhandled exceptions will be thrown for all component renders.
         /// </summary>

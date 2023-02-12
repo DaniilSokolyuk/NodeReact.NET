@@ -14,8 +14,6 @@ watcher.on('change', function (file, stat) {
 requireFiles.map(__non_webpack_require__);
 
 function evalCode(callback, code) {
-    usages++;
-    
     try {
         const result = eval(code);
         callback(null, result);

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net7.0</TargetFrameworks>
+        <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
 
         <Description>Library to render React library components on the server-side with C# as well as on the client.</Description>
         <PackageTags>react, reactjs, nodejs</PackageTags>
@@ -21,9 +21,9 @@
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
 
         <PackageReference Include="Jering.Javascript.NodeJS" Version="7.0.0-beta.2" />
-        <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
 
-        <PackageReference Include="Yarn.MSBuild" Version="1.22.10" PrivateAssets="all" ExcludeAssets="Runtime">
+        <PackageReference Include="Yarn.MSBuild" Version="1.22.19" PrivateAssets="all" ExcludeAssets="Runtime">
             <IncludeAssets>compile; build; native; contentfiles; analyzers</IncludeAssets>
         </PackageReference>
     </ItemGroup>

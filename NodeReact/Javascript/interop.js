@@ -1,24 +1,26 @@
-﻿var filewatcher = require('filewatcher');
+﻿const filewatcher = require('filewatcher');
 
-var requireFiles = process.env.NODEREACT_REQUIREFILES.split(',').map(t => t.replace(/\\/g, '/'));
-var fileWatcherDebounce = parseInt(process.env.NODEREACT_FILEWATCHERDEBOUNCE);
+const requireFiles = process.env.NODEREACT_REQUIREFILES.split(',').map(t => t.replace(/\\/g, '/'));
+const fileWatcherDebounce = parseInt(process.env.NODEREACT_FILEWATCHERDEBOUNCE);
 
-var watcher = filewatcher({
+const watcher = filewatcher({
     debounce: fileWatcherDebounce, // debounce events in non-polling mode by 10ms
 });
+
 requireFiles.map(t => watcher.add(t));
-watcher.on('change', function (file, stat) {
-    process.exit(0)
+
+watcher.on('change', () => {
+    process.exit(0);
 });
 
 requireFiles.map(__non_webpack_require__);
 
-function evalCode(callback, code) {
+const evalCode = (callback, code) => {
     try {
         const result = eval(code);
+
         callback(null, result);
-    }
-    catch (err) {
+    } catch (err) {
         callback(err, null);
     }
 }

@@ -1,5 +1,9 @@
-﻿global.React = require('react');
-global.ReactDOM = require('react-dom');
-global.ReactDOMServer = require('react-dom/server');
+﻿import React from 'react';
+import ReactDOM from 'react-dom';
+import ReactDOMServer from 'react-dom/server.node';
 
-var Components = require('expose?Components!./components');
+global.React = React;
+global.ReactDOM = ReactDOM;
+global.ReactDOMServer = ReactDOMServer;
+
+require('expose-loader?exposes=Components!./components/index');

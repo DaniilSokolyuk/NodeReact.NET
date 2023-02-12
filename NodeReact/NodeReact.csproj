@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
+        <TargetFrameworks>net7.0</TargetFrameworks>
 
         <Description>Library to render React library components on the server-side with C# as well as on the client.</Description>
         <PackageTags>react, reactjs, nodejs</PackageTags>
@@ -43,7 +43,7 @@
     </ItemGroup>
 
     <Target Name="JavascriptBuild" BeforeTargets="DispatchToInnerBuilds;PreBuildEvent" Inputs="@(JavascriptInputs)" Outputs="@(JavascriptOutputs)">
-        <Yarn WorkingDirectory=".\Javascript" Command="run build --env.mode=$(Configuration) --env.bundleName=$(BundleName)" />
+        <Yarn WorkingDirectory=".\Javascript" Command="run build --env mode=$(Configuration) --env entry=$(BundleName)" />
     </Target>
 
 </Project>

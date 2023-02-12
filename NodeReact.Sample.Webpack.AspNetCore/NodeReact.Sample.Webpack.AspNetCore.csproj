@@ -5,4 +5,7 @@
   <ItemGroup>
     <ProjectReference Include="..\NodeReact\NodeReact.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="wwwroot" />
+  </ItemGroup>
 </Project>

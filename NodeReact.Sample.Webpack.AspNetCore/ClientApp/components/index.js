@@ -1,9 +1,11 @@
-import HelloWorld from './HelloWorld';
-import RootComponent from './RootComponent';
+import HelloWorld from "./HelloWorld";
+import RootComponent from "./RootComponent";
 
-const components = {
-    HelloWorld,
-    RootComponent
+export const components = {
+  HelloWorld,
+  RootComponent,
 };
 
-module.exports = components;
+try {
+  module.exports = components;
+} catch {}

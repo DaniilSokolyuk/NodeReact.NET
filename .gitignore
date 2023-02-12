@@ -5,7 +5,9 @@
 
 #Custom
 /NodeReact.Sample.Webpack.AspNetCore/wwwroot/client.bundle.js
+/NodeReact.Sample.Webpack.AspNetCore/wwwroot/client.bundle.js.LICENSE.txt
 /NodeReact.Sample.Webpack.AspNetCore/wwwroot/server.bundle.js
+/NodeReact.Sample.Webpack.AspNetCore/wwwroot/server.bundle.js.LICENSE.txt
 
 # User-specific files
 *.rsuser

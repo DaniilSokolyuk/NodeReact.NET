@@ -1,9 +1,8 @@
 ﻿import React from 'react';
 import ReactDOM from 'react-dom';
-import Components from './components';
+import { components } from './components';
 
 window.React = React;
 window.ReactDOM = ReactDOM;
 
-window.Components = Components;
-
+window.Components = components;

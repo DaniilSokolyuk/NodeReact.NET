@@ -1,7 +1,11 @@
-﻿import React, { PureComponent } from 'react';
+﻿// @ts-check
 
-export default class HelloWorld extends PureComponent {
-    render() {
-        return (<h1>Hello {this.props.name}</h1>);
-    }
-}
+import React from "react";
+
+/**
+ * @param {object} props
+ * @param {string} props.name
+ */
+const HelloWorld = ({ name }) => <h1>Hello {name}</h1>;
+
+export default HelloWorld;

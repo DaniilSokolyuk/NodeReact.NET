@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Buffers;
+using System.IO;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using NodeReact.Utils;
@@ -31,42 +32,41 @@ namespace NodeReact.Components
                 return;
             }
 
-            using (var executeEngineCode = GetEngineCodeExecute())
+            try
             {
-                try
-                {
-                    RoutingContext = await _nodeInvocationService.Invoke<RoutingContext>("evalCode", new object[] {executeEngineCode});
-                    OutputHtml = RoutingContext.html;
-                }
-                catch (Exception ex)
-                {
-                    ExceptionHandler(ex, ComponentName, ContainerId);
-                }
+                SerializedProps ??= _configuration.PropsSerializer.Serialize(Props);
+
+                var renderResult = await _nodeInvocationService.Invoke<Stream>(
+                    "renderRouter",
+                    new object[] { ContainerId, ComponentName, ServerOnly, SerializedProps, Path });
+
+                OutputHtml = new PooledStream();
+                await renderResult.CopyToAsync(OutputHtml.Stream);
             }
+            catch (Exception ex)
+            {
+                ExceptionHandler(ex, ComponentName, ContainerId);
+            }
+            
         }
         
-        private IMemoryOwner<char> GetEngineCodeExecute()
-        {
-            using (var textWriter = new ArrayPooledTextWriter())
-            {
+     //   private IMemoryOwner<char> GetEngineCodeExecute()
+     //   {
+                //textWriter.Write("var context={};");
+                //textWriter.Write("Object.assign(context, {html:");
 
-                textWriter.Write("var context={};");
-                textWriter.Write("Object.assign(context, {html:");
+               // textWriter.Write(ServerOnly ? "ReactDOMServer.renderToStaticMarkup(React.createElement(" : "ReactDOMServer.renderToString(React.createElement(");
+               // textWriter.Write(ComponentName);
+               // textWriter.Write(",Object.assign(");
+              //  WriterSerialziedProps(textWriter);
+              //  textWriter.Write(",{location:");
+              //  textWriter.Write(JsonConvert.SerializeObject(Path));
+              //  textWriter.Write(",context:context})))");
 
-                textWriter.Write(ServerOnly ? "ReactDOMServer.renderToStaticMarkup(React.createElement(" : "ReactDOMServer.renderToString(React.createElement(");
-                textWriter.Write(ComponentName);
-                textWriter.Write(",Object.assign(");
-                WriterSerialziedProps(textWriter);
-                textWriter.Write(",{location:");
-                textWriter.Write(JsonConvert.SerializeObject(Path));
-                textWriter.Write(",context:context})))");
-
-                textWriter.Write("})");
-
-
-                return textWriter.GetMemoryOwner();
-            }
-        }
+               // textWriter.Write("})");
+    //    }
+    
+    
     }
 
     public class RoutingContext

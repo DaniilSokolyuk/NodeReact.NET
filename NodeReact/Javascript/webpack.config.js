@@ -9,6 +9,9 @@ module.exports = env => {
 
     return [
         {
+            resolve: {
+                extensions: ['.js']
+            },
             entry: './interop.js',
             output: {
                 filename: env.entry,

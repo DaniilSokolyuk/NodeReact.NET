@@ -4,6 +4,7 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Jering.Javascript.NodeJS;
+using Microsoft.IO;
 using Newtonsoft.Json;
 using NodeReact.Utils;
 
@@ -98,26 +99,15 @@ namespace NodeReact.Components
         protected void WriterSerialziedProps(TextWriter writer)
         {
             SerializedProps ??= _configuration.PropsSerializer.Serialize(Props);
-
-            var stream = SerializedProps.Stream;
-            stream.Position = 0;
-
-            var textWriterBufferWriter = new TextWriterBufferWriter(writer);
-            
-            Encoding.UTF8.GetDecoder().Convert(
-                stream.GetReadOnlySequence(), 
-                textWriterBufferWriter, 
-                true, 
-                out _, 
-                out _);
+            WriteUtf8Stream(writer, SerializedProps.Stream);
         }
 
-        protected IMemoryOwner<char> OutputHtml { get; set; }
+        private protected PooledStream OutputHtml { get; set; }
         public void WriteOutputHtmlTo(TextWriter writer)
         {
             if (ServerOnly)
             {
-                WriteSpan(writer, OutputHtml);
+                WriteUtf8Stream(writer, OutputHtml.Stream);
                 return;
             }
 
@@ -137,7 +127,7 @@ namespace NodeReact.Components
 
             if (!ClientOnly)
             {
-                WriteSpan(writer, OutputHtml);
+                WriteUtf8Stream(writer, OutputHtml.Stream);
             }
 
             writer.Write("</");
@@ -145,19 +135,18 @@ namespace NodeReact.Components
             writer.Write('>');
         }
         
-        
-        //TODO: because PagedBufferedTextWriter not has override for SPANS
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void WriteSpan(TextWriter viewWriter, IMemoryOwner<char> owner)
+        private static void WriteUtf8Stream(TextWriter writer, RecyclableMemoryStream stream)
         {
-            if (owner is PooledBuffer<char> buffer)
-            {
-                viewWriter.Write(buffer.Data, 0, buffer.Length);
-            }
-            else
-            {
-                viewWriter.Write(owner.Memory.Span);
-            }
+            stream.Position = 0;
+            var textWriterBufferWriter = new TextWriterBufferWriter(writer);
+            
+            Encoding.UTF8.GetDecoder().Convert(
+                stream.GetReadOnlySequence(), 
+                textWriterBufferWriter, 
+                true, 
+                out _, 
+                out _);
         }
 
         /// <summary>

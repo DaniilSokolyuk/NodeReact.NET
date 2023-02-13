@@ -3,6 +3,7 @@ using System.Buffers;
 using System.IO;
 using System.Text;
 using System.Text.Json;
+using Microsoft.IO;
 using NodeReact.Utils;
 using NewtonsoftJson = Newtonsoft.Json;
 using NewtonsoftJsonSerializer = Newtonsoft.Json.JsonSerializer;
@@ -79,5 +80,22 @@ internal class SystemTextJsonPropsSerializer : IPropsSerializer
         JsonSerializer.Serialize(new Utf8JsonWriter((IBufferWriter<byte>)pooledStream.Stream), props, _jsonSerializerOptions);
 
         return new PropsSerialized(pooledStream);
+    }
+}
+
+internal class PropsSerialized : IDisposable
+{
+    private PooledStream _pooledStream;
+
+    public PropsSerialized(PooledStream pooledStream)
+    {
+        _pooledStream = pooledStream;
+    }
+    
+    public RecyclableMemoryStream Stream => _pooledStream.Stream;
+
+    public void Dispose()
+    {
+        _pooledStream?.Dispose();
     }
 }

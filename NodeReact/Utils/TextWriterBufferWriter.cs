@@ -6,7 +6,7 @@ namespace NodeReact.Utils;
 
 internal class TextWriterBufferWriter: IBufferWriter<char>
 {
-    private static readonly ArrayPool<char> _pagePool = ArrayPool<char>.Shared;
+    private static readonly MemoryPool<char> _memoryPool = MemoryPool<char>.Shared;
 
     private readonly TextWriter _textWriter;
 
@@ -15,44 +15,24 @@ internal class TextWriterBufferWriter: IBufferWriter<char>
         _textWriter = textWriter;
     }
 
-    private char[] _bufferWritePage;
+    private IMemoryOwner<char> _memoryOwner;
     public void Advance(int count)
     {
-        _textWriter.Write(_bufferWritePage, 0, count);
+        _textWriter.Write(_memoryOwner.Memory.Span.Slice(0, count));
             
-        _pagePool.Return(_bufferWritePage);
-        _bufferWritePage = null;
+        _memoryOwner.Dispose();
+        _memoryOwner = null;
     }
 
     public Memory<char> GetMemory(int sizeHint = 0)
     {
-        try
-        {
-            _bufferWritePage = _pagePool.Rent(sizeHint);
-        }
-        catch when (_bufferWritePage != null)
-        {
-            _pagePool.Return(_bufferWritePage);
-            _bufferWritePage = null;
-            throw;
-        }
-            
-        return _bufferWritePage.AsMemory();
+        _memoryOwner = _memoryPool.Rent(sizeHint);
+        return _memoryOwner.Memory;
     }
 
     public Span<char> GetSpan(int sizeHint = 0)
     {
-        try
-        {
-            _bufferWritePage = _pagePool.Rent(sizeHint);
-        }
-        catch when (_bufferWritePage != null)
-        {
-            _pagePool.Return(_bufferWritePage);
-            _bufferWritePage = null;
-            throw;
-        }
-            
-        return _bufferWritePage.AsSpan();
+        _memoryOwner = _memoryPool.Rent(sizeHint);
+        return _memoryOwner.Memory.Span;
     }
 }

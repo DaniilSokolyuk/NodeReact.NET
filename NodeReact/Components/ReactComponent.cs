@@ -1,5 +1,6 @@
 using System;
-using System.Buffers;
+using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using NodeReact.Utils;
 
@@ -29,46 +30,21 @@ namespace NodeReact.Components
                 return;
             }
 
-            using (var executeEngineCode = GetEngineCodeExecute())
+            try
             {
-                try
-                {
-                    var renderResult = await _nodeInvocationService.Invoke<RenderResult>(
-                        "evalCode", 
-                        new object[] {executeEngineCode});
-                    
-                    OutputHtml = renderResult.html;
-                }
-                catch (Exception ex)
-                {
-                    ExceptionHandler(ex, ComponentName, ContainerId);
-                }
-            }
-        }
+                SerializedProps ??= _configuration.PropsSerializer.Serialize(Props);
 
-        private IMemoryOwner<char> GetEngineCodeExecute()
-        {
-            using (var writer = new ArrayPooledTextWriter())
+                var renderResult = await _nodeInvocationService.Invoke<Stream>(
+                    "renderComponent",
+                    new object[] { ContainerId, ComponentName, ServerOnly, SerializedProps });
+
+                OutputHtml = new PooledStream();
+                await renderResult.CopyToAsync(OutputHtml.Stream);
+            }
+            catch (Exception ex)
             {
-                writer.Write("var context={};");
-                writer.Write("Object.assign(context, {html:");
-
-                writer.Write(ServerOnly ? "ReactDOMServer.renderToStaticMarkup(React.createElement(" : "ReactDOMServer.renderToString(React.createElement(");
-                writer.Write(ComponentName);
-                writer.Write(',');
-                WriterSerialziedProps(writer);
-                writer.Write("))");
-
-                writer.Write("})");
-
-                return writer.GetMemoryOwner();
+                ExceptionHandler(ex, ComponentName, ContainerId);
             }
-        }
-
-        private class RenderResult
-        {
-            public IMemoryOwner<char> html { get; set; }
-
         }
     }
 }

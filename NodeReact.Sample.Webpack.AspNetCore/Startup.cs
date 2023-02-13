@@ -22,6 +22,7 @@ namespace NodeReact.Sample.Webpack.AspNetCore
             services.AddNodeReact(
                 config =>
                 {
+                    config.EnginesCount = 1;
                     config.ConfigureOutOfProcessNodeJSServiceOptions = o =>
                     {
                         o.NumRetries = 0;
@@ -30,8 +31,8 @@ namespace NodeReact.Sample.Webpack.AspNetCore
                     config.AddScriptWithoutTransform("~/server.bundle.js");
                     config.UseDebugReact = true;
 
-                    //config.SetSystemTextJsonPropsSerializer((_) => { });
-                    config.SetNewtonsoftJsonPropsSerializer((_) => { });
+                    config.SetSystemTextJsonPropsSerializer((_) => { });
+                    //config.SetNewtonsoftJsonPropsSerializer((_) => { });
                 });
         }
 

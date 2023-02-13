@@ -1,9 +1,8 @@
 using System;
 using System.Buffers;
-using System.IO;
 using System.Text;
 using System.Text.Json;
-using Microsoft.IO;
+using Microsoft.AspNetCore.WebUtilities;
 using NodeReact.Utils;
 using NewtonsoftJson = Newtonsoft.Json;
 using NewtonsoftJsonSerializer = Newtonsoft.Json.JsonSerializer;
@@ -26,14 +25,14 @@ internal class NewtonsoftJsonPropsSerializer : IPropsSerializer
     
     public PropsSerialized Serialize(object props)
     {
-        var pooledStream = new PooledStream();
-        using var streamWriter = new StreamWriter(pooledStream.Stream, Encoding.UTF8, -1, true);
+        var pooledStream = new PooledStream(); 
+        using var streamWriter = new HttpResponseStreamWriter(pooledStream.Stream, Encoding.UTF8);
         using var jsonWriter = new NewtonsoftJson.JsonTextWriter(streamWriter);
         jsonWriter.CloseOutput = false;
         jsonWriter.AutoCompleteOnClose = false;
         jsonWriter.ArrayPool = JsonArrayPool<char>.Instance;
         _jsonSerializer.Serialize(jsonWriter, props);
-
+        
         return new PropsSerialized(pooledStream);
     }
     
@@ -78,24 +77,8 @@ internal class SystemTextJsonPropsSerializer : IPropsSerializer
     { 
         var pooledStream = new PooledStream();
         JsonSerializer.Serialize(new Utf8JsonWriter((IBufferWriter<byte>)pooledStream.Stream), props, _jsonSerializerOptions);
-
+        
         return new PropsSerialized(pooledStream);
     }
 }
 
-internal class PropsSerialized : IDisposable
-{
-    private PooledStream _pooledStream;
-
-    public PropsSerialized(PooledStream pooledStream)
-    {
-        _pooledStream = pooledStream;
-    }
-    
-    public RecyclableMemoryStream Stream => _pooledStream.Stream;
-
-    public void Dispose()
-    {
-        _pooledStream?.Dispose();
-    }
-}

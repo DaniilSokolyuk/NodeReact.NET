@@ -1,18 +1,8 @@
 ﻿@using NodeReact.AspNetCore
 @model dynamic
 
-@await Html.ReactAsync("Components.HelloWorld", new { name = RandomString(10) })
+@await Html.ReactAsync("Components.HelloWorld", new { name = "World" })
 
 
 @await Html.ReactRouterAsync("Components.RootComponent", new { })
 
-
-@{
-    string RandomString(int length)
-        {
-            var random = new Random();
-            const string chars = "ABCD34\\56/789'{}\"[]!@#$%^&*;";
-            return new string(Enumerable.Repeat(chars, length)
-                .Select(s => s[random.Next(s.Length)]).ToArray());
-        }
-}

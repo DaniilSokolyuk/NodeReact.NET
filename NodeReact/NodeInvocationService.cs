@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Buffers;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -39,7 +38,7 @@ namespace NodeReact
             {
                 IServiceProvider serviceProvider = scope.ServiceProvider;
 
-                IHostingEnvironment hostingEnvironment = serviceProvider.GetService<IHostingEnvironment>();
+                IWebHostEnvironment hostingEnvironment = serviceProvider.GetService<IWebHostEnvironment>();
 
                 var requireFiles = configuration.ScriptFilesWithoutTransform
                     .Select(relativePath =>

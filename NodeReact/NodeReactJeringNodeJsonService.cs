@@ -6,15 +6,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using Jering.Javascript.NodeJS;
 
-namespace NodeReact.Jering.Javascript.NodeJS
+namespace NodeReact
 {
-    internal class CustomJsonService : IJsonService
+    internal class NodeReactJeringNodeJsonService : IJsonService
     {
         private static readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions
         {
             Converters =
             {
-                new PooledCharMemoryOwnerJsonConverter(), 
                 new PropsSerializedJsonConverter()
             },
             DefaultBufferSize = 64536,

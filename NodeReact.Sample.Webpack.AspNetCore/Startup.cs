@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using NodeReact.AspNetCore.ViewEngine;
 
 namespace NodeReact.Sample.Webpack.AspNetCore
 {
@@ -17,22 +18,27 @@ namespace NodeReact.Sample.Webpack.AspNetCore
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().AddRazorRuntimeCompilation();
+            services.AddMvc()
+                .AddRazorRuntimeCompilation()
+                .AddViewOptions(o =>
+                {
+                    o.ViewEngines.Insert(0, new NodeReactViewEngine());
+                });
 
             services.AddNodeReact(
                 config =>
                 {
-                    config.EnginesCount = 1;
-                    config.ConfigureOutOfProcessNodeJSServiceOptions = o =>
+                    config.EnginesCount = 2;
+                    config.ConfigureOutOfProcessNodeJSService(o =>
                     {
                         o.NumRetries = 0;
-                        o.InvocationTimeoutMS = 2000;
-                    };
+                        o.InvocationTimeoutMS = 10000;
+                    });
                     config.AddScriptWithoutTransform("~/server.bundle.js");
                     config.UseDebugReact = true;
 
-                    config.SetSystemTextJsonPropsSerializer((_) => { });
-                    //config.SetNewtonsoftJsonPropsSerializer((_) => { });
+                    config.ConfigureSystemTextJsonPropsSerializer((_) => { });
+                    //config.ConfigureNewtonsoftJsonPropsSerializer((_) => { });
                 });
         }
 

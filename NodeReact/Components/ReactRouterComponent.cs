@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Buffers;
 using System.IO;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 using NodeReact.Utils;
 
 namespace NodeReact.Components
@@ -22,14 +20,12 @@ namespace NodeReact.Components
         }
 
         public string Path { get; set; }
-
-        public RoutingContext RoutingContext { get; private set; }
-
-        public async Task RenderRouterWithContext()
+        
+        public async Task<RoutingContext> RenderRouterWithContext()
         {
             if (ClientOnly)
             {
-                return;
+                return new RoutingContext();
             }
 
             try
@@ -42,47 +38,53 @@ namespace NodeReact.Components
 
                 OutputHtml = new PooledStream();
                 await renderResult.CopyToAsync(OutputHtml.Stream);
+
+                return new RoutingContext();
             }
             catch (Exception ex)
             {
                 ExceptionHandler(ex, ComponentName, ContainerId);
+                return new RoutingContext();;
             }
-            
         }
         
-     //   private IMemoryOwner<char> GetEngineCodeExecute()
-     //   {
-                //textWriter.Write("var context={};");
-                //textWriter.Write("Object.assign(context, {html:");
+        public async Task<RoutingContext> RenderToStream(Stream stream)
+        {
+            try
+            {
+                SerializedProps ??= _configuration.PropsSerializer.Serialize(Props);
 
-               // textWriter.Write(ServerOnly ? "ReactDOMServer.renderToStaticMarkup(React.createElement(" : "ReactDOMServer.renderToString(React.createElement(");
-               // textWriter.Write(ComponentName);
-               // textWriter.Write(",Object.assign(");
-              //  WriterSerialziedProps(textWriter);
-              //  textWriter.Write(",{location:");
-              //  textWriter.Write(JsonConvert.SerializeObject(Path));
-              //  textWriter.Write(",context:context})))");
+                var renderResult = await _nodeInvocationService.Invoke<Stream>(
+                    "renderRouter",
+                    new object[] { ContainerId, ComponentName, ServerOnly, SerializedProps, Path });
 
-               // textWriter.Write("})");
-    //    }
-    
-    
+                OutputHtml = new PooledStream();
+                await renderResult.CopyToAsync(stream);
+
+                return new RoutingContext();
+            }
+            catch (Exception ex)
+            {
+                ExceptionHandler(ex, ComponentName, ContainerId);
+                return new RoutingContext();;
+            }
+        }
     }
 
     public class RoutingContext
     {
-        public IMemoryOwner<char> html { get; set; }
-
         /// <summary>
         /// HTTP Status Code.
         /// If present signifies that the given status code should be returned by server.
         /// </summary>
-        public int? status { get; set; }
+        public int? StatusCode { get; set; }
 
         /// <summary>
         /// URL to redirect to.
         /// If included this signals that React Router determined a redirect should happen.
         /// </summary>
-        public string url { get; set; }
+        public string Url { get; set; }
+        
+        
     }
 }

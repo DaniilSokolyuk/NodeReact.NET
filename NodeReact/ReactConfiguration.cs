@@ -10,20 +10,20 @@ using NewtonsoftJsonSerializer = Newtonsoft.Json.JsonSerializer;
 namespace NodeReact
 {
     /// <summary>
-    /// Site-wide configuration for ReactJS.NET
+    /// NodeReact configuration.
     /// </summary>
     public class ReactConfiguration
     {
         public ReactConfiguration()
         {
-            SetSystemTextJsonPropsSerializer(_ => {});
+            ConfigureSystemTextJsonPropsSerializer(_ => {});
         }
         
-        /// <summary>
-        /// All the scripts that have been added to this configuration 
-        /// </summary>
         internal readonly IList<string> ScriptFilesWithoutTransform = new List<string>();
-        
+        internal Action<NodeJSProcessOptions> ConfigureNodeJSProcessOptionsAction;
+        internal Action<OutOfProcessNodeJSServiceOptions> ConfigureOutOfProcessNodeJSServiceOptionsAction;
+        internal Action<HttpNodeJSServiceOptions> ConfigureHttpNodeJSServiceOptionsAction;
+
         internal IPropsSerializer PropsSerializer { get; set; }
 
         public ReactConfiguration AddScriptWithoutTransform(string script)
@@ -31,13 +31,6 @@ namespace NodeReact
             ScriptFilesWithoutTransform.Add(script);
             return this;
         }
-
-        /// <summary>
-        /// ChakraCore engine settings
-        /// </summary>
-        public Action<NodeJSProcessOptions> ConfigureNodeJSProcessOptions { get; set; }
-
-        public Action<OutOfProcessNodeJSServiceOptions> ConfigureOutOfProcessNodeJSServiceOptions { get; set; }
 
         /// <summary>
         /// Gets or sets the number of max engines. 
@@ -83,7 +76,7 @@ namespace NodeReact
         /// Set Newtonsoft.Json serializer for React props.
         /// </summary>
         /// <param name="configureJsonSerializerSettings"></param>
-        public void SetNewtonsoftJsonPropsSerializer(Action<JsonSerializerSettings> configureJsonSerializerSettings)
+        public void ConfigureNewtonsoftJsonPropsSerializer(Action<JsonSerializerSettings> configureJsonSerializerSettings)
         {
             var jsonSerializerSettings = new JsonSerializerSettings
             {
@@ -98,7 +91,7 @@ namespace NodeReact
         /// Set System.Text.Json serializer for React props.
         /// </summary>
         /// <param name="configureJsonSerializerOptions"></param>
-        public void SetSystemTextJsonPropsSerializer(Action<JsonSerializerOptions> configureJsonSerializerOptions)
+        public void ConfigureSystemTextJsonPropsSerializer(Action<JsonSerializerOptions> configureJsonSerializerOptions)
         {
             var jsonSerializerOptions = new JsonSerializerOptions
             {
@@ -110,6 +103,21 @@ namespace NodeReact
             
             configureJsonSerializerOptions(jsonSerializerOptions);  
             PropsSerializer = new SystemTextJsonPropsSerializer(jsonSerializerOptions);
+        }
+        
+        public void ConfigureNodeJSProcess(Action<NodeJSProcessOptions> configureNodeJSProcessOptions)
+        {
+            ConfigureNodeJSProcessOptionsAction = configureNodeJSProcessOptions;
+        }
+        
+        public void ConfigureOutOfProcessNodeJSService(Action<OutOfProcessNodeJSServiceOptions> configureOutOfProcessNodeJSServiceOptions)
+        {
+            ConfigureOutOfProcessNodeJSServiceOptionsAction = configureOutOfProcessNodeJSServiceOptions;
+        }
+        
+        public void ConfigureHttpNodeJSService(Action<HttpNodeJSServiceOptions> configureHttpNodeJSServiceOptions)
+        {
+            ConfigureHttpNodeJSServiceOptionsAction = configureHttpNodeJSServiceOptions;
         }
     }
 }

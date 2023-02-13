@@ -47,12 +47,10 @@ namespace NodeReact.AspNetCore
             }
 
             reactComponent.Path = path;
-
-            await reactComponent.RenderRouterWithContext();
-
-            var executionResult = reactComponent.RoutingContext;
-
-            if (executionResult?.status != null || executionResult?.url != null)
+            
+            var executionResult = await reactComponent.RenderRouterWithContext();
+            
+            if (executionResult?.StatusCode != null || executionResult?.Url != null)
             {
                 // Use provided contextHandler
                 if (contextHandler != null)
@@ -62,20 +60,20 @@ namespace NodeReact.AspNetCore
                 // Handle routing context internally
                 else
                 {
-                    var statusCode = executionResult.status ?? 302;
+                    var statusCode = executionResult.StatusCode ?? 302;
 
                     // 300-399
                     if (statusCode >= 300 && statusCode < 400)
                     {
-                        if (!string.IsNullOrEmpty(executionResult.url))
+                        if (!string.IsNullOrEmpty(executionResult.Url))
                         {
                             if (statusCode == 301)
                             {
-                                response.Redirect(executionResult.url, true);
+                                response.Redirect(executionResult.Url, true);
                             }
                             else // 302 and all others
                             {
-                                response.Redirect(executionResult.url);
+                                response.Redirect(executionResult.Url);
                             }
                         }
                         else

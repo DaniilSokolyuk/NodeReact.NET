@@ -15,14 +15,12 @@ namespace NodeReact
         {
             throw new NotImplementedException();
         }
-        
+
+        //TODO: https://github.com/dotnet/runtime/pull/76444 .NET 8.0 huge perf improvement
         public override void Write(Utf8JsonWriter writer, PropsSerialized value, JsonSerializerOptions options)
         {
-            value.Stream.Position = 0;
-            foreach (var seq in value.Stream.GetReadOnlySequence())
-            {
-                writer.WriteRawValue(seq.Span, true);
-            }
+            var span = value.Stream.GetBuffer().AsSpan().Slice(0, (int)value.Stream.Length);
+            writer.WriteRawValue(span, true);
         }
     }
 }

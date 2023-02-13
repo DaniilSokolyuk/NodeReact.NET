@@ -9,9 +9,9 @@ internal class PooledStream : IDisposable
 
     private static readonly RecyclableMemoryStreamManager _manager;
     
-    static  PooledStream()
+    static PooledStream()
     {
-        var blockSize = 1024 * 128;
+        var blockSize = 1024 ;
         var largeBufferMultiple = 1024 * 1024;
         var maximumBufferSize = 128 * 1024 * 1024;
         

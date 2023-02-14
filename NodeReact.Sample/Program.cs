@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 
-namespace NodeReact.Sample.AspNetCore
+namespace NodeReact.Sample
 {
     public class Program
     {

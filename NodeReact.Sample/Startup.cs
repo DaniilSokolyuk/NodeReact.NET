@@ -3,9 +3,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using NodeReact.AspNetCore.ViewEngine;
 
-namespace NodeReact.Sample.Webpack.AspNetCore.Streaming
+namespace NodeReact.Sample.AspNetCore
 {
     public class Startup
     {
@@ -18,12 +17,7 @@ namespace NodeReact.Sample.Webpack.AspNetCore.Streaming
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc()
-                .AddViewOptions(o =>
-                {
-                    // if you want react view engine for all views, use NodeReactViewEngine("", "default component name")
-                    o.ViewEngines.Insert(0, new NodeReactViewEngine("$"));
-                });
+            services.AddMvc().AddRazorRuntimeCompilation();
 
             services.AddNodeReact(
                 config =>

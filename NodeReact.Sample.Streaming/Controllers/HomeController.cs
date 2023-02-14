@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace NodeReact.Sample.Webpack.AspNetCore.Streaming.Controllers
+namespace NodeReact.Sample.Streaming.Controllers
 {
     public class HomeController : Controller
     {

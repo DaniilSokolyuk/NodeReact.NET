@@ -5,11 +5,13 @@ VisualStudioVersion = 16.0.29424.173
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NodeReact", "NodeReact\NodeReact.csproj", "{1B104197-ED72-4B52-8635-BFAE4BBD7227}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NodeReact.Sample.Webpack.AspNetCore", "NodeReact.Sample.Webpack.AspNetCore\NodeReact.Sample.Webpack.AspNetCore.csproj", "{E3A3B8D4-6708-44DB-B541-B4859EA3A703}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NodeReact.Benchmarks", "NodeReact.Benchmarks\NodeReact.Benchmarks.csproj", "{9C5320AB-21A3-47B6-87D7-AB1D5DC00EA0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NodeReact.Sample.Webpack.AspNetCore.Streaming", "NodeReact.Sample.Webpack.AspNetCor.Streaming\NodeReact.Sample.Webpack.AspNetCore.Streaming.csproj", "{80567183-794B-4586-AA21-5A8C86EDDBDF}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{5616CD9F-0287-4C37-9670-F41B4C45BF9B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NodeReact.Sample", "NodeReact.Sample\NodeReact.Sample.csproj", "{E0EF4D07-EE58-40E3-B30C-3485DA9B7857}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NodeReact.Sample.Streaming", "NodeReact.Sample.Streaming\NodeReact.Sample.Streaming.csproj", "{3B1B136D-C2F4-4999-BC37-D85CD86E03DA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,23 +23,27 @@ Global
 		{1B104197-ED72-4B52-8635-BFAE4BBD7227}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1B104197-ED72-4B52-8635-BFAE4BBD7227}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1B104197-ED72-4B52-8635-BFAE4BBD7227}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E3A3B8D4-6708-44DB-B541-B4859EA3A703}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E3A3B8D4-6708-44DB-B541-B4859EA3A703}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E3A3B8D4-6708-44DB-B541-B4859EA3A703}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E3A3B8D4-6708-44DB-B541-B4859EA3A703}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9C5320AB-21A3-47B6-87D7-AB1D5DC00EA0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9C5320AB-21A3-47B6-87D7-AB1D5DC00EA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9C5320AB-21A3-47B6-87D7-AB1D5DC00EA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9C5320AB-21A3-47B6-87D7-AB1D5DC00EA0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{80567183-794B-4586-AA21-5A8C86EDDBDF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{80567183-794B-4586-AA21-5A8C86EDDBDF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{80567183-794B-4586-AA21-5A8C86EDDBDF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{80567183-794B-4586-AA21-5A8C86EDDBDF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E0EF4D07-EE58-40E3-B30C-3485DA9B7857}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E0EF4D07-EE58-40E3-B30C-3485DA9B7857}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E0EF4D07-EE58-40E3-B30C-3485DA9B7857}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E0EF4D07-EE58-40E3-B30C-3485DA9B7857}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B1B136D-C2F4-4999-BC37-D85CD86E03DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B1B136D-C2F4-4999-BC37-D85CD86E03DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B1B136D-C2F4-4999-BC37-D85CD86E03DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B1B136D-C2F4-4999-BC37-D85CD86E03DA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {89D6609F-A2E2-432B-A327-0C759394E878}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{E0EF4D07-EE58-40E3-B30C-3485DA9B7857} = {5616CD9F-0287-4C37-9670-F41B4C45BF9B}
+		{3B1B136D-C2F4-4999-BC37-D85CD86E03DA} = {5616CD9F-0287-4C37-9670-F41B4C45BF9B}
 	EndGlobalSection
 EndGlobal

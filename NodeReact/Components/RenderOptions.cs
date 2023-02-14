@@ -1,9 +1,8 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using NodeReact.Components;
 
-namespace NodeReact.AspNetCore.ViewEngine;
+namespace NodeReact.Components;
 
 
 /// <summary>

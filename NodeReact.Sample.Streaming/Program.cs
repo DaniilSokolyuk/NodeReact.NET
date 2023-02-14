@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 
-namespace NodeReact.Sample.Webpack.AspNetCore.Streaming
+namespace NodeReact.Sample.Streaming
 {
     public class Program
     {

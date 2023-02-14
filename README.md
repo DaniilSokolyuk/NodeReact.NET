@@ -2,7 +2,7 @@
 Library to render React library components on the server-side with C# as well as on the client.
 
 # Features
-* Streaming, waiting for data, Suspnse and hydrateRoot... support via custom [View Engine](https://github.com/DaniilSokolyuk/NodeReact.NET/tree/master/NodeReact.Sample.Webpack.AspNetCor.Streaming)
+* Streaming, waiting for data, Suspnse and hydrateRoot... support via custom [View Engine](https://github.com/DaniilSokolyuk/NodeReact.NET/tree/master/NodeReact.Sample.Streaming)
 * High performance
 * Truly async
 
@@ -16,7 +16,7 @@ ReactJS.NET api is almost completely compatible except
 * @Html.React to @await Html.ReactAsync
 * @Html.ReactWithInit to @await Html.ReactAsync 
 * @Html.ReactRouter to @await Html.ReactRouterAsync
-3. Register NodeReact in service collection, example [here](https://github.com/DaniilSokolyuk/NodeReact.NET/blob/master/NodeReact.Sample.Webpack.AspNetCore/Startup.cs)
+3. Register NodeReact in service collection, example [here](https://github.com/DaniilSokolyuk/NodeReact.NET/blob/master/NodeReact.Sample/Startup.cs)
 
 Ensure that any your server bundle define global variables for react like
 ```

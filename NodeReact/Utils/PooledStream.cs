@@ -11,7 +11,7 @@ internal class PooledStream : IDisposable
     
     static PooledStream()
     {
-        var blockSize = 1024 ;
+        var blockSize = 1024 * 128;
         var largeBufferMultiple = 1024 * 1024;
         var maximumBufferSize = 128 * 1024 * 1024;
         

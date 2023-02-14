@@ -14,11 +14,11 @@ watcher.on('change', () => {
 });
 
 requireFiles.map(__non_webpack_require__);
-const renderComponent = (callback, componentId, componentName, serverOnly, props, options, path) => {
+const renderComponent = (callback, componentId, options, props) => {
     try {
-        const component = resolveComponent(global, componentName)
+        const component = resolveComponent(global, options.componentName)
 
-        if (serverOnly) {
+        if (options.serverOnly) {
             const res = ReactDOMServer.renderToStaticNodeStream(
                 React.createElement(component, Object.assign(props, {
                     location: path || "",
@@ -32,12 +32,12 @@ const renderComponent = (callback, componentId, componentName, serverOnly, props
             if (!options.disableBootstrapPropsInPlace) {
                 bootstrapScriptContent = `(window.__nrp = window.__nrp || {})['${componentId}'] = ${JSON.stringify(props)}; ${options.bootstrapScriptContent || ''}`
             } else {
-                bootstrapScriptContent = `${options.bootstrapScriptContent || ''}`
+                bootstrapScriptContent = options.bootstrapScriptContent
             }
             
             const {pipe} = ReactDOMServer.renderToPipeableStream(
                 React.createElement(component, Object.assign(props, {
-                    location: path || "",
+                    location: options.location || "",
                     context: context
                 })),
                 {

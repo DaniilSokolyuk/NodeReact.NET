@@ -1,10 +1,15 @@
+using System;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using NodeReact.Components;
+
 namespace NodeReact.AspNetCore.ViewEngine;
 
 
 /// <summary>
 /// Node react stream options, more information here https://beta.reactjs.org/reference/react-dom/server/renderToPipeableStream
 /// </summary>
-public class NodeReactViewOptions
+public class RenderOptions
 {
     /// <summary>
     /// Replace default location (request.Path.ToString() + request.QueryString).
@@ -15,6 +20,11 @@ public class NodeReactViewOptions
     /// Replace component name.
     /// </summary>
     public string ComponentName { get; set; }
+    
+    /// <summary>
+    /// Render on server only, disables almost all features, useful for static generations.
+    /// </summary>
+    public bool ServerOnly { get; set; }
     
     /// <summary>
     /// Disable streaming and return all data from 'onAllReady' without waiting, useful for static generations and search crawlers.
@@ -63,4 +73,6 @@ public class NodeReactViewOptions
     /// https://github.com/facebook/react/blob/14c2be8dac2d5482fda8a0906a31d239df8551fc/packages/react-server/src/ReactFizzServer.js#L210-L225
     /// </summary>
     public int? ProgressiveChunkSize { get; set; }
+
+    public  Func<HttpResponse, RoutingContext, Task> RoutingHandler { get; set; }
 }

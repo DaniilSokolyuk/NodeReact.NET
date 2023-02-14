@@ -5,7 +5,7 @@ namespace NodeReact.AspNetCore.ViewEngine;
 /// <summary>
 /// INodeReactViewOptionsProvider provider is called on each rendering of a react component from NodeReactViewEngine.
 /// </summary>
-public interface INodeReactViewOptionsProvider
+public interface INodeReactRenderOptionsProvider
 {
     /// <summary>
     /// Provide node react direct streaming options.
@@ -13,5 +13,5 @@ public interface INodeReactViewOptionsProvider
     /// <param name="context"></param>
     /// <param name="componentName"></param>
     /// <returns></returns>
-    NodeReactViewOptions Provide(ViewContext context, string componentName);
+    RenderOptions Provide(ViewContext context, string componentName);
 }

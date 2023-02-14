@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 using NodeReact.AspNetCore.ViewEngine;
@@ -21,78 +20,39 @@ namespace NodeReact.Components
         {
         }
 
-        public string Path { get; set; }
+        public string Location { get; set; }
         
         public async Task<RoutingContext> RenderRouterWithContext()
         {
             if (ClientOnly)
             {
-                return new RoutingContext();
+                return null;
             }
 
             try
             {
-                SerializedProps ??= _configuration.PropsSerializer.Serialize(Props);
-
-                var httpResponseMessage = await _nodeInvocationService.Invoke<HttpResponseMessage>(
-                    "renderRouter",
-                    new object[] { ContainerId, ComponentName, ServerOnly, SerializedProps, new
-                    {
-                        disableStreaming = false,
-                        disableBootstrapPropsInPlace = false,
-                    }, Path });
+                var routingContext = await Render(new RenderOptions
+                {
+                    Location = Location,
+                    DisableStreaming = true,
+                    DisableBootstrapPropsInPlace = true,
+                    BootstrapScriptContent = null,
+                    ComponentName = ComponentName,
+                    ServerOnly = ServerOnly,
+                    Nonce = NonceProvider?.Invoke(),
+                });
 
                 OutputHtml = new PooledStream();
-                await httpResponseMessage.Content.CopyToAsync(OutputHtml.Stream);
+                await routingContext.CopyToStream(OutputHtml.Stream);
 
-                return new RoutingContext();
+                return routingContext;
             }
             catch (Exception ex)
             {
                 ExceptionHandler(ex, ComponentName, ContainerId);
-                return new RoutingContext();;
             }
+
+            return null;
         }
-        
-        public async Task<RoutingContext> RenderToStream(Stream stream, NodeReactViewOptions options)
-        {
-            try
-            {
-                SerializedProps ??= _configuration.PropsSerializer.Serialize(Props);
-
-                var httpResponseMessage = await _nodeInvocationService.Invoke<HttpResponseMessage>(
-                    "renderComponent",
-                    new object[] { ContainerId, ComponentName, ServerOnly, SerializedProps, new
-                    {
-                        disableStreaming = options.DisableStreaming,
-                        disableBootstrapPropsInPlace = options.DisableBootstrapPropsInPlace,
-                        bootstrapScriptContent = options.BootstrapScriptContent,
-                    }, Path });
-
-                await httpResponseMessage.Content.CopyToAsync(stream);
-
-                return new RoutingContext();
-            }
-            catch (Exception ex)
-            {
-                ExceptionHandler(ex, ComponentName, ContainerId);
-                return new RoutingContext();;
-            }
-        }
-    }
-
-    public class RoutingContext
-    {
-        /// <summary>
-        /// HTTP Status Code.
-        /// If present signifies that the given status code should be returned by server.
-        /// </summary>
-        public int? StatusCode { get; set; }
-
-        /// <summary>
-        /// URL to redirect to.
-        /// If included this signals that React Router determined a redirect should happen.
-        /// </summary>
-        public string Url { get; set; }
     }
 }

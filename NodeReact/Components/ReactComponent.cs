@@ -1,6 +1,6 @@
 using System;
-using System.Net.Http;
 using System.Threading.Tasks;
+using NodeReact.AspNetCore.ViewEngine;
 using NodeReact.Utils;
 
 namespace NodeReact.Components
@@ -31,18 +31,18 @@ namespace NodeReact.Components
 
             try
             {
-                SerializedProps ??= _configuration.PropsSerializer.Serialize(Props);
-
-                var httpResponseMessage = await _nodeInvocationService.Invoke<HttpResponseMessage>(
-                    "renderComponent",
-                    new object[] { ContainerId, ComponentName, ServerOnly, new
-                    {
-                        disableStreaming = true,
-                        disableBootstrapPropsInPlace = true,
-                    }, SerializedProps });
+                var routingContext = await Render(new RenderOptions
+                {
+                    DisableStreaming = true,
+                    DisableBootstrapPropsInPlace = true,
+                    BootstrapScriptContent = null,
+                    ComponentName = ComponentName,
+                    ServerOnly = ServerOnly,
+                    Nonce = NonceProvider?.Invoke(),
+                });
 
                 OutputHtml = new PooledStream();
-                await httpResponseMessage.Content.CopyToAsync(OutputHtml.Stream);
+                await routingContext.CopyToStream(OutputHtml.Stream);
             }
             catch (Exception ex)
             {

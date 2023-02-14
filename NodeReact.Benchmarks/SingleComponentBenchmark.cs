@@ -19,7 +19,7 @@ namespace NodeReact.Benchmarks
                 var component = reactContext.CreateComponent<NodeReact.Components.ReactRouterComponent>("__desktopComponents.App");
                 component.Props = _testData;
                 component.ServerOnly = true;
-                component.Path = "/movie/246436/";
+                component.Location = "/movie/246436/";
 
                 await component.RenderRouterWithContext();
 

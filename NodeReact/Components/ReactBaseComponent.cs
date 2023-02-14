@@ -1,8 +1,12 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
+using System.Net.Http;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading.Tasks;
 using Microsoft.IO;
+using NodeReact.AspNetCore.ViewEngine;
 using NodeReact.Utils;
 
 namespace NodeReact.Components
@@ -26,6 +30,33 @@ namespace NodeReact.Components
             _nodeInvocationService = nodeInvocationService;
 
             ExceptionHandler = _configuration.ExceptionHandler;
+        }
+
+        public async Task<RoutingContext> Render(RenderOptions options)
+        {
+            SerializedProps ??= _configuration.PropsSerializer.Serialize(Props);
+
+            var httpResponseMessage = await _nodeInvocationService.Invoke<HttpResponseMessage>(
+                "renderComponent",
+                new object[] { ContainerId, options, SerializedProps });
+
+            string url = null;
+            if (httpResponseMessage.Headers.TryGetValues("RspUrl", out var urlHeader))
+            {
+                url = urlHeader.FirstOrDefault();
+            }
+
+            int? code = null;
+            if (httpResponseMessage.Headers.TryGetValues("RspCode", out var codeHeader) &&
+                int.TryParse(codeHeader.FirstOrDefault(), out var codeValue))
+            {
+                code = codeValue;
+            }
+
+            return new RoutingContext(
+                url,
+                code,
+                streamToCopyTo => httpResponseMessage.Content.CopyToAsync(streamToCopyTo));
         }
 
 
@@ -74,7 +105,6 @@ namespace NodeReact.Components
         /// </summary>
         public bool ServerOnly { get; set; }
 
-
         private bool _clientOnly;
 
         /// <summary>
@@ -85,8 +115,10 @@ namespace NodeReact.Components
             get => !_configuration.UseServerSideRendering || _clientOnly;
             set => _clientOnly = value;
         }
-        
-        public string Nonce { get; set; }
+
+        public Func<string> NonceProvider { get; set; }
+
+        public bool BootstrapInPlace { get; set; }
 
         /// <summary>
         /// Sets the props for this component
@@ -94,6 +126,14 @@ namespace NodeReact.Components
         public object Props { get; set; }
 
         public Action<Exception, string, string> ExceptionHandler { get; set; }
+
+
+        public delegate string BootstrapScriptContent(string componentId);
+
+        /// <summary>
+        /// If specified, this string will be placed in an inline &lt;script&gt; tag after window.__nrp props
+        /// </summary>
+        public BootstrapScriptContent BootstrapScriptContentProvider { get; set; }
 
         internal PropsSerialized SerializedProps { get; set; }
 
@@ -129,17 +169,47 @@ namespace NodeReact.Components
 
             if (!ClientOnly)
             {
-                WriteUtf8Stream(writer, OutputHtml.Stream);
+                WriteUtf8Stream(writer, OutputHtml?.Stream);
             }
 
             writer.Write("</");
             writer.Write(ContainerTag);
             writer.Write('>');
+
+            if (BootstrapInPlace)
+            {
+                writer.Write("<script");
+                if (NonceProvider != null)
+                {
+                    writer.Write(" nonce=\"");
+                    writer.Write(NonceProvider());
+                    writer.Write("\"");
+                }
+
+                writer.Write(">");
+                writer.Write("(window.__nrp = window.__nrp || {})['");
+                writer.Write(ContainerId);
+                writer.Write("'] = ");
+                WriterSerialziedProps(writer);
+                writer.Write(';');
+
+                if (BootstrapScriptContentProvider != null)
+                {
+                    writer.Write(BootstrapScriptContentProvider(ContainerId));
+                }
+
+                writer.Write("</script>");
+            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void WriteUtf8Stream(TextWriter writer, RecyclableMemoryStream stream)
         {
+            if (stream?.Length == 0)
+            {
+                return;
+            }
+
             stream.Position = 0;
             var textWriterBufferWriter = new TextWriterBufferWriter(writer);
 
@@ -168,12 +238,38 @@ namespace NodeReact.Components
                 writer.Write("\")).render(React.createElement(");
                 writer.Write(ComponentName);
                 writer.Write(',');
-                WriterSerialziedProps(writer);
+                if (BootstrapInPlace)
+                {
+                    writer.Write("window.__nrp['");
+                    writer.Write(ContainerId);
+                    writer.Write("']");
+                }
+                else
+                {
+                    WriterSerialziedProps(writer);
+                }
+
                 writer.Write("))");
             }
-
-            //if not client only, server retunrs html and after js to hydrate
-            //server only hydration not required
+            else
+            {
+                writer.Write("ReactDOM.hydrateRoot(document.getElementById(\"");
+                writer.Write(ContainerId);
+                writer.Write("\"), React.createElement(");
+                writer.Write(ComponentName);
+                writer.Write(',');
+                if (BootstrapInPlace)
+                {
+                    writer.Write("window.__nrp['");
+                    writer.Write(ContainerId);
+                    writer.Write("']");
+                }
+                else
+                {
+                    WriterSerialziedProps(writer);
+                }
+                writer.Write("))");
+            }
         }
 
         public virtual void Dispose()

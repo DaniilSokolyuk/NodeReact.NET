@@ -25,13 +25,16 @@ namespace NodeReact.AspNetCore
             bool clientOnly = false,
             bool serverOnly = false,
             string containerClass = null,
-            Action<HttpResponse, RoutingContext> contextHandler = null)
+            Action<HttpResponse, RoutingContext> contextHandler = null,
+            bool bootstrapInPlace = false,
+            ReactBaseComponent.BootstrapScriptContent bootstrapScriptContentProvider = null)
         {
             var response = htmlHelper.ViewContext.HttpContext.Response;
             var request = htmlHelper.ViewContext.HttpContext.Request;
             path = path ?? request.Path.ToString() + request.QueryString;
 
             var scopedContext = htmlHelper.ViewContext.HttpContext.RequestServices.GetRequiredService<IReactScopedContext>();
+            var config = htmlHelper.ViewContext.HttpContext.RequestServices.GetRequiredService<ReactConfiguration>();
 
             var reactComponent = scopedContext.CreateComponent<ReactRouterComponent>(componentName: componentName);
 
@@ -40,13 +43,16 @@ namespace NodeReact.AspNetCore
             reactComponent.ClientOnly = clientOnly;
             reactComponent.ServerOnly = serverOnly;
             reactComponent.ContainerClass = containerClass;
+            reactComponent.NonceProvider = config.ScriptNonceProvider;
+            reactComponent.BootstrapInPlace = bootstrapInPlace;
+            reactComponent.BootstrapScriptContentProvider = bootstrapScriptContentProvider;
 
             if (!string.IsNullOrEmpty(htmlTag))
             {
                 reactComponent.ContainerTag = htmlTag;
             }
 
-            reactComponent.Path = path;
+            reactComponent.Location = path;
             
             var executionResult = await reactComponent.RenderRouterWithContext();
             
@@ -104,7 +110,8 @@ namespace NodeReact.AspNetCore
         /// <param name="serverOnly">Skip rendering React specific data-attributes, container and client-side initialisation during server side rendering. Defaults to <c>false</c></param>
         /// <param name="containerClass">HTML class(es) to set on the container tag</param>
         /// <param name="exceptionHandler">A custom exception handler that will be called if a component throws during a render. Args: (Exception ex, string componentName, string containerId)</param>
-        /// <param name="hydrateInPlace">If true, the component will be hydrated in place, rather you should call ReactInitJavaScript or hydrate manually. Defaults ts <c>false</c></param>
+        /// <param name="bootstrapInPlace">If true, the bootstrap script will be placed in the container tag instead of the end of the body</param>
+        /// <param name="bootstrapScriptContentProvider">If specified, this string will be placed in an inline &lt;script&gt; tag after window.__nrp props</param>
         /// <returns>The component's HTML</returns>
         public static async Task<IHtmlContent> ReactAsync<T>(
             this IHtmlHelper htmlHelper,
@@ -116,10 +123,12 @@ namespace NodeReact.AspNetCore
             bool serverOnly = false,
             string containerClass = null,
             Action<Exception, string, string> exceptionHandler = null,
-            bool hydrateInPlace = false
-        )
+            bool bootstrapInPlace = false,
+            ReactBaseComponent.BootstrapScriptContent bootstrapScriptContentProvider = null)
         {
             var scopedContext = htmlHelper.ViewContext.HttpContext.RequestServices.GetRequiredService<IReactScopedContext>();
+            var config = htmlHelper.ViewContext.HttpContext.RequestServices.GetRequiredService<ReactConfiguration>();
+
             var reactComponent = scopedContext.CreateComponent<ReactComponent>(componentName: componentName);
 
             reactComponent.Props = props;
@@ -127,6 +136,9 @@ namespace NodeReact.AspNetCore
             reactComponent.ClientOnly = clientOnly;
             reactComponent.ServerOnly = serverOnly;
             reactComponent.ContainerClass = containerClass;
+            reactComponent.NonceProvider = config.ScriptNonceProvider;
+            reactComponent.BootstrapInPlace = bootstrapInPlace;
+            reactComponent.BootstrapScriptContentProvider = bootstrapScriptContentProvider;
             
             if (exceptionHandler != null)
             {

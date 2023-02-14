@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Buffers;
+using System.Net.Http;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
+using NodeReact.AspNetCore.ViewEngine;
 using NodeReact.Utils;
 
 namespace NodeReact.Components
@@ -20,69 +20,39 @@ namespace NodeReact.Components
         {
         }
 
-        public string Path { get; set; }
-
-        public RoutingContext RoutingContext { get; private set; }
-
-        public async Task RenderRouterWithContext()
+        public string Location { get; set; }
+        
+        public async Task<RoutingContext> RenderRouterWithContext()
         {
             if (ClientOnly)
             {
-                return;
+                return null;
             }
 
-            using (var executeEngineCode = GetEngineCodeExecute())
+            try
             {
-                try
+                var routingContext = await Render(new RenderOptions
                 {
-                    RoutingContext = await _nodeInvocationService.Invoke<RoutingContext>("evalCode", executeEngineCode);
-                    OutputHtml = RoutingContext.html;
-                }
-                catch (Exception ex)
-                {
-                    ExceptionHandler(ex, ComponentName, ContainerId);
-                }
+                    Location = Location,
+                    DisableStreaming = true,
+                    DisableBootstrapPropsInPlace = true,
+                    BootstrapScriptContent = null,
+                    ComponentName = ComponentName,
+                    ServerOnly = ServerOnly,
+                    Nonce = NonceProvider?.Invoke(),
+                });
+
+                OutputHtml = new PooledStream();
+                await routingContext.CopyToStream(OutputHtml.Stream);
+
+                return routingContext;
             }
-        }
-        
-        private IMemoryOwner<char> GetEngineCodeExecute()
-        {
-            using (var textWriter = new ArrayPooledTextWriter())
+            catch (Exception ex)
             {
-
-                textWriter.Write("var context={};");
-                textWriter.Write("Object.assign(context, {html:");
-
-                textWriter.Write(ServerOnly ? "ReactDOMServer.renderToStaticMarkup(React.createElement(" : "ReactDOMServer.renderToString(React.createElement(");
-                textWriter.Write(ComponentName);
-                textWriter.Write(",Object.assign(");
-                WriterSerialziedProps(textWriter);
-                textWriter.Write(",{location:");
-                textWriter.Write(JsonConvert.SerializeObject(Path, _configuration.JsonSerializerSettings));
-                textWriter.Write(",context:context})))");
-
-                textWriter.Write("})");
-
-
-                return textWriter.GetMemoryOwner();
+                ExceptionHandler(ex, ComponentName, ContainerId);
             }
+
+            return null;
         }
-    }
-
-    public class RoutingContext
-    {
-        public IMemoryOwner<char> html { get; set; }
-
-        /// <summary>
-        /// HTTP Status Code.
-        /// If present signifies that the given status code should be returned by server.
-        /// </summary>
-        public int? status { get; set; }
-
-        /// <summary>
-        /// URL to redirect to.
-        /// If included this signals that React Router determined a redirect should happen.
-        /// </summary>
-        public string url { get; set; }
     }
 }

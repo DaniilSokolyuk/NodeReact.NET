@@ -1,78 +1,53 @@
-﻿import { Component } from 'react';
-import {
-  Link,
-  BrowserRouter,
-  Route,
-  Switch,
-  StaticRouter,
-  Redirect
-} from 'react-router-dom';
+﻿import React from "react";
+import {Link, BrowserRouter, Route, Routes, Navigate} from "react-router-dom";
+import {StaticRouter} from "react-router-dom/server";
+import LoremIpsum from "./LoremIpsum";
 
-class Navbar extends Component {
-  render() {
-    return (
-      <ul>
+const Navbar = () => (
+    <ul>
         <li>
-          <Link to="/">Home</Link>
+            <Link to="/">Home</Link>
         </li>
         <li>
-          <Link to="/about">About</Link>
+            <Link to="/about">About</Link>
         </li>
         <li>
-          <Link to="/contact">Contact</Link>
+            <Link to="/contact">Contact</Link>
         </li>
-      </ul>
-    );
-  }
-}
+        <li>
+            <Link to="/lorem">Lorem</Link>
+        </li>
+    </ul>
+);
 
-class HomePage extends Component {
-  render() {
-    return <h1>Home</h1>;
-  }
-}
+const HomePage = () => <h1>Home</h1>;
 
-class AboutPage extends Component {
-  render() {
-    return <h1>About</h1>;
-  }
-}
+const AboutPage = () => <h1>About</h1>;
 
-class ContactPage extends Component {
-  render() {
-    return <h1>Contact</h1>;
-  }
-}
+const ContactPage = () => <h1>Contact</h1>;
 
-export default class RootComponent extends Component {
-  render() {
+const RootComponent = ({location}) => {
     const app = (
-      <div>
-        <Navbar />
-        <Switch>
-          <Route exact path="/" render={() => <Redirect to="/home" />} />
-          <Route path="/home" component={HomePage} />
-          <Route path="/about" component={AboutPage} />
-          <Route path="/contact" component={ContactPage} />
-          <Route
-            path="*"
-            component={({ staticContext }) => {
-                          if (staticContext) staticContext.status = 404;
+        <div>
+            <Navbar/>
 
-                          return <h1>Not Found :(</h1>;
-                        }}
-          />
-        </Switch>
-      </div>
+            <Routes>
+                <Route path="/" element={<Navigate to="/home" replace/>}/>
+                <Route path="/home" element={<HomePage/>}/>
+                <Route path="/about" element={<AboutPage/>}/>
+                <Route path="/contact" element={<ContactPage/>}/>
+                <Route path="/lorem" element={<LoremIpsum/>}/>
+
+                <Route path="*" element={<h1>Not Found :(</h1>}/>
+            </Routes>
+        </div>
     );
 
-    if (typeof window === 'undefined') {
-      return (
-        <StaticRouter context={this.props.context} location={this.props.location}>
-          {app}
-        </StaticRouter>
-      );
+    if (typeof window === "undefined") {
+        return <StaticRouter location={location}>{app}</StaticRouter>;
     }
+
     return <BrowserRouter>{app}</BrowserRouter>;
-  }
-}
+};
+
+export default RootComponent;

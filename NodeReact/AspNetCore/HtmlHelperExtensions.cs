@@ -25,13 +25,16 @@ namespace NodeReact.AspNetCore
             bool clientOnly = false,
             bool serverOnly = false,
             string containerClass = null,
-            Action<HttpResponse, RoutingContext> contextHandler = null)
+            Action<HttpResponse, RoutingContext> contextHandler = null,
+            bool bootstrapInPlace = false,
+            ReactBaseComponent.BootstrapScriptContent bootstrapScriptContentProvider = null)
         {
             var response = htmlHelper.ViewContext.HttpContext.Response;
             var request = htmlHelper.ViewContext.HttpContext.Request;
             path = path ?? request.Path.ToString() + request.QueryString;
 
             var scopedContext = htmlHelper.ViewContext.HttpContext.RequestServices.GetRequiredService<IReactScopedContext>();
+            var config = htmlHelper.ViewContext.HttpContext.RequestServices.GetRequiredService<ReactConfiguration>();
 
             var reactComponent = scopedContext.CreateComponent<ReactRouterComponent>(componentName: componentName);
 
@@ -40,19 +43,20 @@ namespace NodeReact.AspNetCore
             reactComponent.ClientOnly = clientOnly;
             reactComponent.ServerOnly = serverOnly;
             reactComponent.ContainerClass = containerClass;
+            reactComponent.NonceProvider = config.ScriptNonceProvider;
+            reactComponent.BootstrapInPlace = bootstrapInPlace;
+            reactComponent.BootstrapScriptContentProvider = bootstrapScriptContentProvider;
 
             if (!string.IsNullOrEmpty(htmlTag))
             {
                 reactComponent.ContainerTag = htmlTag;
             }
 
-            reactComponent.Path = path;
-
-            await reactComponent.RenderRouterWithContext();
-
-            var executionResult = reactComponent.RoutingContext;
-
-            if (executionResult?.status != null || executionResult?.url != null)
+            reactComponent.Location = path;
+            
+            var executionResult = await reactComponent.RenderRouterWithContext();
+            
+            if (executionResult?.StatusCode != null || executionResult?.Url != null)
             {
                 // Use provided contextHandler
                 if (contextHandler != null)
@@ -62,25 +66,25 @@ namespace NodeReact.AspNetCore
                 // Handle routing context internally
                 else
                 {
-                    var statusCode = executionResult.status ?? 302;
+                    var statusCode = executionResult.StatusCode ?? 302;
 
                     // 300-399
                     if (statusCode >= 300 && statusCode < 400)
                     {
-                        if (!string.IsNullOrEmpty(executionResult.url))
+                        if (!string.IsNullOrEmpty(executionResult.Url))
                         {
                             if (statusCode == 301)
                             {
-                                response.Redirect(executionResult.url, true);
+                                response.Redirect(executionResult.Url, true);
                             }
                             else // 302 and all others
                             {
-                                response.Redirect(executionResult.url);
+                                response.Redirect(executionResult.Url);
                             }
                         }
                         else
                         {
-                            throw new ZeroReactException("Router requested redirect but no url provided.");
+                            throw new NodeReactException("Router requested redirect but no url provided.");
                         }
                     }
                     else
@@ -106,6 +110,8 @@ namespace NodeReact.AspNetCore
         /// <param name="serverOnly">Skip rendering React specific data-attributes, container and client-side initialisation during server side rendering. Defaults to <c>false</c></param>
         /// <param name="containerClass">HTML class(es) to set on the container tag</param>
         /// <param name="exceptionHandler">A custom exception handler that will be called if a component throws during a render. Args: (Exception ex, string componentName, string containerId)</param>
+        /// <param name="bootstrapInPlace">If true, the bootstrap script will be placed in the container tag instead of the end of the body</param>
+        /// <param name="bootstrapScriptContentProvider">If specified, this string will be placed in an inline &lt;script&gt; tag after window.__nrp props</param>
         /// <returns>The component's HTML</returns>
         public static async Task<IHtmlContent> ReactAsync<T>(
             this IHtmlHelper htmlHelper,
@@ -116,10 +122,12 @@ namespace NodeReact.AspNetCore
             bool clientOnly = false,
             bool serverOnly = false,
             string containerClass = null,
-            Action<Exception, string, string> exceptionHandler = null
-        )
+            Action<Exception, string, string> exceptionHandler = null,
+            bool bootstrapInPlace = false,
+            ReactBaseComponent.BootstrapScriptContent bootstrapScriptContentProvider = null)
         {
             var scopedContext = htmlHelper.ViewContext.HttpContext.RequestServices.GetRequiredService<IReactScopedContext>();
+            var config = htmlHelper.ViewContext.HttpContext.RequestServices.GetRequiredService<ReactConfiguration>();
 
             var reactComponent = scopedContext.CreateComponent<ReactComponent>(componentName: componentName);
 
@@ -128,7 +136,10 @@ namespace NodeReact.AspNetCore
             reactComponent.ClientOnly = clientOnly;
             reactComponent.ServerOnly = serverOnly;
             reactComponent.ContainerClass = containerClass;
-
+            reactComponent.NonceProvider = config.ScriptNonceProvider;
+            reactComponent.BootstrapInPlace = bootstrapInPlace;
+            reactComponent.BootstrapScriptContentProvider = bootstrapScriptContentProvider;
+            
             if (exceptionHandler != null)
             {
                 reactComponent.ExceptionHandler = exceptionHandler;
@@ -142,61 +153,6 @@ namespace NodeReact.AspNetCore
             await reactComponent.RenderHtml();
 
             return new ActionHtmlString(writer => reactComponent.WriteOutputHtmlTo(writer));
-        }
-
-        /// <summary>
-        /// Renders the specified React component, along with its client-side initialisation code.
-        /// Normally you would use the <see cref="React{T}"/> method, but <see cref="ReactWithInit{T}"/>
-        /// is useful when rendering self-contained partial views.
-        /// </summary>
-        /// <typeparam name="T">Type of the props</typeparam>
-        /// <param name="htmlHelper">HTML helper</param>
-        /// <param name="componentName">Name of the component</param>
-        /// <param name="props">Props to initialise the component with</param>
-        /// <param name="htmlTag">HTML tag to wrap the component in. Defaults to &lt;div&gt;</param>
-        /// <param name="containerId">ID to use for the container HTML tag. Defaults to an auto-generated ID</param>
-        /// <param name="clientOnly">Skip rendering server-side and only output client-side initialisation code. Defaults to <c>false</c></param>
-        /// <param name="containerClass">HTML class(es) to set on the container tag</param>
-        /// <param name="exceptionHandler">A custom exception handler that will be called if a component throws during a render. Args: (Exception ex, string componentName, string containerId)</param>
-        /// <returns>The component's HTML</returns>
-        public static async Task<IHtmlContent> ReactWithInitAsync<T>(
-            this IHtmlHelper htmlHelper,
-            string componentName,
-            T props,
-            string htmlTag = null,
-            string containerId = null,
-            bool clientOnly = false,
-            string containerClass = null,
-            Action<Exception, string, string> exceptionHandler = null
-        )
-        {
-            var scopedContext = htmlHelper.ViewContext.HttpContext.RequestServices.GetRequiredService<IReactScopedContext>();
-            var config = htmlHelper.ViewContext.HttpContext.RequestServices.GetRequiredService<ReactConfiguration>();
-
-            var reactComponent = scopedContext.CreateComponent<ReactComponent>(componentName: componentName);
-
-            reactComponent.Props = props;
-            reactComponent.ContainerId = containerId;
-            reactComponent.ClientOnly = clientOnly;
-            reactComponent.ContainerClass = containerClass;
-
-            if (exceptionHandler != null)
-            {
-                reactComponent.ExceptionHandler = exceptionHandler;
-            }
-
-            if (!string.IsNullOrEmpty(htmlTag))
-            {
-                reactComponent.ContainerTag = htmlTag;
-            }
-
-            await reactComponent.RenderHtml();
-
-            return new ActionHtmlString(writer =>
-            {
-                reactComponent.WriteOutputHtmlTo(writer);
-                WriteScriptTag(writer, bodyWriter => reactComponent.RenderJavaScript(bodyWriter), config.ScriptNonceProvider);
-            });
         }
 
         /// <summary>

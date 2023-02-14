@@ -1,27 +1,30 @@
 using System;
 using System.Collections.Generic;
+using System.Text.Encodings.Web;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Jering.Javascript.NodeJS;
 using Newtonsoft.Json;
+using NewtonsoftJsonSerializer = Newtonsoft.Json.JsonSerializer;
 
 namespace NodeReact
 {
     /// <summary>
-    /// Site-wide configuration for ReactJS.NET
+    /// NodeReact configuration.
     /// </summary>
     public class ReactConfiguration
     {
         public ReactConfiguration()
         {
-            SetJsonSerializerSettings(new JsonSerializerSettings
-            {
-                StringEscapeHandling = StringEscapeHandling.EscapeHtml
-            });
+            ConfigureSystemTextJsonPropsSerializer(_ => {});
         }
-
-        /// <summary>
-        /// All the scripts that have been added to this configuration 
-        /// </summary>
+        
         internal readonly IList<string> ScriptFilesWithoutTransform = new List<string>();
+        internal Action<NodeJSProcessOptions> ConfigureNodeJSProcessOptionsAction;
+        internal Action<OutOfProcessNodeJSServiceOptions> ConfigureOutOfProcessNodeJSServiceOptionsAction;
+        internal Action<HttpNodeJSServiceOptions> ConfigureHttpNodeJSServiceOptionsAction;
+
+        internal IPropsSerializer PropsSerializer { get; set; }
 
         public ReactConfiguration AddScriptWithoutTransform(string script)
         {
@@ -29,41 +32,11 @@ namespace NodeReact
             return this;
         }
 
-        internal JsonSerializerSettings JsonSerializerSettings;
-
-        internal JsonSerializer Serializer;
-
-        public ReactConfiguration SetJsonSerializerSettings(JsonSerializerSettings settings)
-        {
-            JsonSerializerSettings = settings;
-            Serializer = JsonSerializer.Create(JsonSerializerSettings);
-            return this;
-        }
-
-        /// <summary>
-        /// ChakraCore engine settings
-        /// </summary>
-        public Action<NodeJSProcessOptions> ConfigureNodeJSProcessOptions { get; set; }
-
-        public Action<OutOfProcessNodeJSServiceOptions> ConfigureOutOfProcessNodeJSServiceOptions { get; set; }
-
-        /// <summary>
-        /// Gets or sets the number of engines to initially start when a pool is created. 
-        /// Defaults to <c>Math.Max(Environment.ProcessorCount - 1, 1)</c>.
-        /// </summary>
-        public int StartEngines { get; set; } = Math.Max(Environment.ProcessorCount - 1, 1);
-
         /// <summary>
         /// Gets or sets the number of max engines. 
-        /// Defaults  <c>Math.Max(Environment.ProcessorCount, 2)</c>.
+        /// Defaults  <c>Math.Max(Environment.ProcessorCount - 1, 2)</c>.
         /// </summary>
-        public int MaxEngines { get; set; } = Math.Max(Environment.ProcessorCount, 2);
-
-        /// <summary>
-        /// Gets or sets the maximum number of times an engine can be reused before it is disposed.
-        /// <c>0</c> is unlimited. Defaults to <c>0</c>.
-        /// </summary>
-        public int MaxUsagesPerEngine { get; set; } = 0;
+        public int EnginesCount { get; set; } = Math.Max(Environment.ProcessorCount - 1, 1);
 
         /// <summary>
         /// Gets or sets whether to use the debug version of React. This is slower, but gives
@@ -83,6 +56,11 @@ namespace NodeReact
         public Func<string> ScriptNonceProvider { get; set; }
 
         /// <summary>
+        /// File watcher debounce time in milliseconds. Defaults to 10.
+        /// </summary>
+        public int FileWatcherDebounceMs { get; set; } = 10;
+
+        /// <summary>
         /// Handle an exception caught during server-render of a component.
         /// If unset, unhandled exceptions will be thrown for all component renders.
         /// </summary>
@@ -93,5 +71,53 @@ namespace NodeReact
                 ex.Message,
                 ContainerId
             ));
+
+        /// <summary>
+        /// Set Newtonsoft.Json serializer for React props.
+        /// </summary>
+        /// <param name="configureJsonSerializerSettings"></param>
+        public void ConfigureNewtonsoftJsonPropsSerializer(Action<JsonSerializerSettings> configureJsonSerializerSettings)
+        {
+            var jsonSerializerSettings = new JsonSerializerSettings
+            {
+                StringEscapeHandling = StringEscapeHandling.EscapeHtml
+            };
+            
+            configureJsonSerializerSettings(jsonSerializerSettings);
+            PropsSerializer = new NewtonsoftJsonPropsSerializer(NewtonsoftJsonSerializer.Create(jsonSerializerSettings));
+        }
+        
+        /// <summary>
+        /// Set System.Text.Json serializer for React props.
+        /// </summary>
+        /// <param name="configureJsonSerializerOptions"></param>
+        public void ConfigureSystemTextJsonPropsSerializer(Action<JsonSerializerOptions> configureJsonSerializerOptions)
+        {
+            var jsonSerializerOptions = new JsonSerializerOptions
+            {
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                PropertyNameCaseInsensitive = true,
+            };
+            
+            configureJsonSerializerOptions(jsonSerializerOptions);  
+            PropsSerializer = new SystemTextJsonPropsSerializer(jsonSerializerOptions);
+        }
+        
+        public void ConfigureNodeJSProcess(Action<NodeJSProcessOptions> configureNodeJSProcessOptions)
+        {
+            ConfigureNodeJSProcessOptionsAction = configureNodeJSProcessOptions;
+        }
+        
+        public void ConfigureOutOfProcessNodeJSService(Action<OutOfProcessNodeJSServiceOptions> configureOutOfProcessNodeJSServiceOptions)
+        {
+            ConfigureOutOfProcessNodeJSServiceOptionsAction = configureOutOfProcessNodeJSServiceOptions;
+        }
+        
+        public void ConfigureHttpNodeJSService(Action<HttpNodeJSServiceOptions> configureHttpNodeJSServiceOptions)
+        {
+            ConfigureHttpNodeJSServiceOptionsAction = configureHttpNodeJSServiceOptions;
+        }
     }
 }

@@ -1,10 +1,12 @@
 ﻿using System;
-using System.Buffers;
 using System.IO;
+using System.Linq;
+using System.Net.Http;
 using System.Runtime.CompilerServices;
-using Jering.Javascript.NodeJS;
-using Newtonsoft.Json;
-using NodeReact.Allocator;
+using System.Text;
+using System.Threading.Tasks;
+using Microsoft.IO;
+using NodeReact.AspNetCore.ViewEngine;
 using NodeReact.Utils;
 
 namespace NodeReact.Components
@@ -30,8 +32,36 @@ namespace NodeReact.Components
             ExceptionHandler = _configuration.ExceptionHandler;
         }
 
-     
+        public async Task<RoutingContext> Render(RenderOptions options)
+        {
+            SerializedProps ??= _configuration.PropsSerializer.Serialize(Props);
+
+            var httpResponseMessage = await _nodeInvocationService.Invoke<HttpResponseMessage>(
+                "renderComponent",
+                new object[] { ContainerId, options, SerializedProps });
+
+            string url = null;
+            if (httpResponseMessage.Headers.TryGetValues("RspUrl", out var urlHeader))
+            {
+                url = urlHeader.FirstOrDefault();
+            }
+
+            int? code = null;
+            if (httpResponseMessage.Headers.TryGetValues("RspCode", out var codeHeader) &&
+                int.TryParse(codeHeader.FirstOrDefault(), out var codeValue))
+            {
+                code = codeValue;
+            }
+
+            return new RoutingContext(
+                url,
+                code,
+                streamToCopyTo => httpResponseMessage.Content.CopyToAsync(streamToCopyTo));
+        }
+
+
         private string _componentName;
+
         /// <summary>
         /// Gets or sets the name of the component
         /// </summary>
@@ -56,7 +86,7 @@ namespace NodeReact.Components
         /// </summary>
         public string ContainerId
         {
-            get => _containerId ?? (_containerId = _reactIdGenerator.Generate());
+            get => _containerId ??= _reactIdGenerator.Generate();
             set => _containerId = value;
         }
 
@@ -75,7 +105,6 @@ namespace NodeReact.Components
         /// </summary>
         public bool ServerOnly { get; set; }
 
-
         private bool _clientOnly;
 
         /// <summary>
@@ -87,6 +116,10 @@ namespace NodeReact.Components
             set => _clientOnly = value;
         }
 
+        public Func<string> NonceProvider { get; set; }
+
+        public bool BootstrapInPlace { get; set; }
+
         /// <summary>
         /// Sets the props for this component
         /// </summary>
@@ -94,32 +127,29 @@ namespace NodeReact.Components
 
         public Action<Exception, string, string> ExceptionHandler { get; set; }
 
-        private IMemoryOwner<char> SerializedProps { get; set; }
-        protected void WriterSerialziedProps(TextWriter writer)
+
+        public delegate string BootstrapScriptContent(string componentId);
+
+        /// <summary>
+        /// If specified, this string will be placed in an inline &lt;script&gt; tag after window.__nrp props
+        /// </summary>
+        public BootstrapScriptContent BootstrapScriptContentProvider { get; set; }
+
+        internal PropsSerialized SerializedProps { get; set; }
+
+        private void WriterSerialziedProps(TextWriter writer)
         {
-            if (SerializedProps == null)
-            {
-                using (var pooledTextWriter = new ArrayPooledTextWriter())
-                using (var jsonWriter = new JsonTextWriter(pooledTextWriter))
-                {
-                    jsonWriter.CloseOutput = false;
-                    jsonWriter.AutoCompleteOnClose = false;
-                    jsonWriter.ArrayPool = JsonArrayPool<char>.Instance;
-                    _configuration.Serializer.Serialize(jsonWriter, Props);
-
-                    SerializedProps = pooledTextWriter.GetMemoryOwner();
-                }
-            }
-
-            WriteSpan(writer, SerializedProps);
+            SerializedProps ??= _configuration.PropsSerializer.Serialize(Props);
+            WriteUtf8Stream(writer, SerializedProps.Stream);
         }
 
-        protected IMemoryOwner<char> OutputHtml { get; set; }
+        private protected PooledStream OutputHtml { get; set; }
+
         public void WriteOutputHtmlTo(TextWriter writer)
         {
             if (ServerOnly)
             {
-                WriteSpan(writer, OutputHtml);
+                WriteUtf8Stream(writer, OutputHtml.Stream);
                 return;
             }
 
@@ -139,27 +169,56 @@ namespace NodeReact.Components
 
             if (!ClientOnly)
             {
-                WriteSpan(writer, OutputHtml);
+                WriteUtf8Stream(writer, OutputHtml?.Stream);
             }
 
             writer.Write("</");
             writer.Write(ContainerTag);
             writer.Write('>');
+
+            if (BootstrapInPlace)
+            {
+                writer.Write("<script");
+                if (NonceProvider != null)
+                {
+                    writer.Write(" nonce=\"");
+                    writer.Write(NonceProvider());
+                    writer.Write("\"");
+                }
+
+                writer.Write(">");
+                writer.Write("(window.__nrp = window.__nrp || {})['");
+                writer.Write(ContainerId);
+                writer.Write("'] = ");
+                WriterSerialziedProps(writer);
+                writer.Write(';');
+
+                if (BootstrapScriptContentProvider != null)
+                {
+                    writer.Write(BootstrapScriptContentProvider(ContainerId));
+                }
+
+                writer.Write("</script>");
+            }
         }
-        
-        
-        //TODO: because PagedBufferedTextWriter not has override for SPANS
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void WriteSpan(TextWriter viewWriter, IMemoryOwner<char> owner)
+        private static void WriteUtf8Stream(TextWriter writer, RecyclableMemoryStream stream)
         {
-            if (owner is PooledBuffer<char> buffer)
+            if (stream?.Length == 0)
             {
-                viewWriter.Write(buffer.Data, 0, buffer.Length);
+                return;
             }
-            else
-            {
-                viewWriter.Write(owner.Memory.Span);
-            }
+
+            stream.Position = 0;
+            var textWriterBufferWriter = new TextWriterBufferWriter(writer);
+
+            Encoding.UTF8.GetDecoder().Convert(
+                stream.GetReadOnlySequence(),
+                textWriterBufferWriter,
+                true,
+                out _,
+                out _);
         }
 
         /// <summary>
@@ -171,13 +230,46 @@ namespace NodeReact.Components
         /// <returns>JavaScript</returns>
         public void RenderJavaScript(TextWriter writer)
         {
-            writer.Write(ClientOnly ? "ReactDOM.render(React.createElement(" : "ReactDOM.hydrate(React.createElement(");
-            writer.Write(ComponentName);
-            writer.Write(',');
-            WriterSerialziedProps(writer);
-            writer.Write("),document.getElementById(\"");
-            writer.Write(ContainerId);
-            writer.Write("\"))");
+            if (ClientOnly)
+            {
+                //ReactDOM.createRoot(document.getElementById("container")).render(React.createElement(HelloWorld, { name: "John" }));
+                writer.Write("ReactDOM.createRoot(document.getElementById(\"");
+                writer.Write(ContainerId);
+                writer.Write("\")).render(React.createElement(");
+                writer.Write(ComponentName);
+                writer.Write(',');
+                if (BootstrapInPlace)
+                {
+                    writer.Write("window.__nrp['");
+                    writer.Write(ContainerId);
+                    writer.Write("']");
+                }
+                else
+                {
+                    WriterSerialziedProps(writer);
+                }
+
+                writer.Write("))");
+            }
+            else
+            {
+                writer.Write("ReactDOM.hydrateRoot(document.getElementById(\"");
+                writer.Write(ContainerId);
+                writer.Write("\"), React.createElement(");
+                writer.Write(ComponentName);
+                writer.Write(',');
+                if (BootstrapInPlace)
+                {
+                    writer.Write("window.__nrp['");
+                    writer.Write(ContainerId);
+                    writer.Write("']");
+                }
+                else
+                {
+                    WriterSerialziedProps(writer);
+                }
+                writer.Write("))");
+            }
         }
 
         public virtual void Dispose()

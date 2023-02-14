@@ -1,7 +1,6 @@
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using Microsoft.Extensions.DependencyInjection;
-using React;
 
 namespace NodeReact.Benchmarks
 {
@@ -19,7 +18,7 @@ namespace NodeReact.Benchmarks
                 var component = reactContext.CreateComponent<NodeReact.Components.ReactRouterComponent>("__desktopComponents.App");
                 component.Props = _testData;
                 component.ServerOnly = true;
-                component.Path = "/movie/246436/";
+                component.Location = "/movie/246436/";
 
                 await component.RenderRouterWithContext();
 
@@ -42,16 +41,6 @@ namespace NodeReact.Benchmarks
 
                 component.WriteOutputHtmlTo(tk);
             }
-        }
-
-        [Benchmark]
-        public void ReactJs_RenderSingle()
-        {
-            var environment = AssemblyRegistration.Container.Resolve<IReactEnvironment>();
-            var component = environment.CreateComponent("__components.MovieAboutPage", _testData, serverOnly: true);
-
-            component.RenderHtml(tk, renderServerOnly: true);
-            environment.ReturnEngineToPool();
         }
     }
 }

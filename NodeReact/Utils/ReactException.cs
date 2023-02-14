@@ -2,14 +2,14 @@
 
 namespace NodeReact.Utils
 {
-    public class ZeroReactException : Exception
+    public class NodeReactException : Exception
     {
-        public ZeroReactException(string message) : base(message)
+        public NodeReactException(string message) : base(message)
         {
 
         }
 
-        public ZeroReactException(string message, Exception innerException) : base(message, innerException)
+        public NodeReactException(string message, Exception innerException) : base(message, innerException)
         {
         }
     }

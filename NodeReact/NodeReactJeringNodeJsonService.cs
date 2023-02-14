@@ -1,25 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
+﻿using System.IO;
 using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using Jering.Javascript.NodeJS;
 
-namespace NodeReact.Jering.Javascript.NodeJS
+namespace NodeReact
 {
-    internal class CustomJsonService : IJsonService
+    internal class NodeReactJeringNodeJsonService : IJsonService
     {
         private static readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions
         {
-            Converters = { new MemoryOwnerJsonConverter()},
+            Converters =
+            {
+                new PropsSerializedJsonConverter()
+            },
             DefaultBufferSize = 64536,
-
+            
             Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            IgnoreNullValues = true,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
             PropertyNameCaseInsensitive = true
         };
 

@@ -1,6 +1,6 @@
 using System;
-using System.Buffers;
 using System.Threading.Tasks;
+using NodeReact.AspNetCore.ViewEngine;
 using NodeReact.Utils;
 
 namespace NodeReact.Components
@@ -29,43 +29,25 @@ namespace NodeReact.Components
                 return;
             }
 
-            using (var executeEngineCode = GetEngineCodeExecute())
+            try
             {
-                try
+                var routingContext = await Render(new RenderOptions
                 {
-                    var renderResult = await _nodeInvocationService.Invoke<RenderResult>("evalCode", executeEngineCode);
-                    OutputHtml = renderResult.html;
-                }
-                catch (Exception ex)
-                {
-                    ExceptionHandler(ex, ComponentName, ContainerId);
-                }
-            }
-        }
+                    DisableStreaming = true,
+                    DisableBootstrapPropsInPlace = true,
+                    BootstrapScriptContent = null,
+                    ComponentName = ComponentName,
+                    ServerOnly = ServerOnly,
+                    Nonce = NonceProvider?.Invoke(),
+                });
 
-        private IMemoryOwner<char> GetEngineCodeExecute()
-        {
-            using (var writer = new ArrayPooledTextWriter())
+                OutputHtml = new PooledStream();
+                await routingContext.CopyToStream(OutputHtml.Stream);
+            }
+            catch (Exception ex)
             {
-                writer.Write("var context={};");
-                writer.Write("Object.assign(context, {html:");
-
-                writer.Write(ServerOnly ? "ReactDOMServer.renderToStaticMarkup(React.createElement(" : "ReactDOMServer.renderToString(React.createElement(");
-                writer.Write(ComponentName);
-                writer.Write(',');
-                WriterSerialziedProps(writer);
-                writer.Write("))");
-
-                writer.Write("})");
-
-                return writer.GetMemoryOwner();
+                ExceptionHandler(ex, ComponentName, ContainerId);
             }
-        }
-
-        private class RenderResult
-        {
-            public IMemoryOwner<char> html { get; set; }
-
         }
     }
 }

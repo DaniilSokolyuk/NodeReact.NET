@@ -1,7 +1,8 @@
 ﻿@using NodeReact.AspNetCore
 @model dynamic
 
-@await Html.ReactAsync("Components.HelloWorld", new { name = "World" })
+@await Html.ReactAsync("Components.HelloWorld", new { name = "World" }, bootstrapInPlace: true)
 
 
 @await Html.ReactRouterAsync("Components.RootComponent", new { })
+

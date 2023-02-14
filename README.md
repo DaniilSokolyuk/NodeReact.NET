@@ -14,7 +14,7 @@ ReactJS.NET api is almost completely compatible except
 1. Make sure you use @await Html.PartialAsync and @await Html.RenderAsync on cshtml views, synchronous calls can deadlock application 
 2. Replace 
 * @Html.React to @await Html.ReactAsync
-* @Html.ReactWithInit to @await ReactAsync 
+* @Html.ReactWithInit to @await Html.ReactAsync 
 * @Html.ReactRouter to @await Html.ReactRouterAsync
 3. Register NodeReact in service collection, example [here](https://github.com/DaniilSokolyuk/NodeReact.NET/blob/master/NodeReact.Sample.Webpack.AspNetCore/Startup.cs)
 

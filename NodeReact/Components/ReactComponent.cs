@@ -1,5 +1,5 @@
 using System;
-using System.IO;
+using System.Net.Http;
 using System.Threading.Tasks;
 using NodeReact.Utils;
 
@@ -33,12 +33,16 @@ namespace NodeReact.Components
             {
                 SerializedProps ??= _configuration.PropsSerializer.Serialize(Props);
 
-                var renderResult = await _nodeInvocationService.Invoke<Stream>(
+                var httpResponseMessage = await _nodeInvocationService.Invoke<HttpResponseMessage>(
                     "renderComponent",
-                    new object[] { ContainerId, ComponentName, ServerOnly, SerializedProps });
+                    new object[] { ContainerId, ComponentName, ServerOnly, new
+                    {
+                        disableStreaming = true,
+                        disableBootstrapPropsInPlace = true,
+                    }, SerializedProps });
 
                 OutputHtml = new PooledStream();
-                await renderResult.CopyToAsync(OutputHtml.Stream);
+                await httpResponseMessage.Content.CopyToAsync(OutputHtml.Stream);
             }
             catch (Exception ex)
             {

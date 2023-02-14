@@ -30,7 +30,7 @@ public class NodeReactView : IView
         reactComponent.Props = context.ViewData.Model;
         reactComponent.Path = options.Location ?? request.Path.ToString() + request.QueryString;
 
-        await reactComponent.RenderToStream(response.Body);
+        await reactComponent.RenderToStream(response.Body, options);
     }
 
     public string Path { get; }

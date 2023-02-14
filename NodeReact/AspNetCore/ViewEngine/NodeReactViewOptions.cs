@@ -7,11 +7,6 @@ namespace NodeReact.AspNetCore.ViewEngine;
 public class NodeReactViewOptions
 {
     /// <summary>
-    /// Disable streaming and return data from 'onAllReady', useful for static generations and search crawlers.
-    /// </summary>
-    public bool DisableStreaming { get; set; }
-    
-    /// <summary>
     /// Replace default location (request.Path.ToString() + request.QueryString).
     /// </summary>
     public string Location { get; set; }
@@ -22,20 +17,34 @@ public class NodeReactViewOptions
     public string ComponentName { get; set; }
     
     /// <summary>
-    ///  If specified, this string will be placed in an inline &lt;script&gt; tag.
+    /// Disable streaming and return all data from 'onAllReady' without waiting, useful for static generations and search crawlers.
     /// </summary>
-    public string BootstrapScriptContent { get; set; }
+    public bool DisableStreaming { get; set; }
+    
+    /// <summary>
+    /// Disable boostrap props in window.__nrp.
+    /// </summary>
+    public bool DisableBootstrapPropsInPlace { get; set; }
+
+    /// <summary>
+    /// If specified, this string will be placed in an inline &lt;script&gt; tag after window.__nrp props.
+    /// You should hydrateRoot here or in BootstrapScripts/BootstrapModules.
+    /// https://github.com/reactwg/react-18/discussions/114
+    /// </summary>
+    public string BootstrapScriptContent { get; set; } = "window.__nrpBoot ? __nrpBoot() : (window.__nrpReady = true)";
     
     /// <summary>
     /// An array of string URLs for the &lt;script&gt; tags to emit on the page. Use this to include the &lt;script&gt;
-    /// that calls hydrateRoot. Omit it if you don’t want to run React on the client at all
+    /// that calls hydrateRoot. Omit it if you don’t want to run React on the client at all.
+    /// You should hydrateRoot here or in BootstrapScriptContent.
+    /// https://github.com/reactwg/react-18/discussions/114
     /// </summary>
-    public string BootstrapScripts { get; set; }
+    public string[] BootstrapScripts { get; set; }
     
     /// <summary>
     /// Like bootstrapScripts, but emits &lt;script type=&quot;module&quot;&gt; instead
     /// </summary>
-    public string BootstrapModules { get; set; }
+    public string[] BootstrapModules { get; set; }
     
     /// <summary>
     /// A string with the root namespace URI for the stream. Defaults to regular HTML.

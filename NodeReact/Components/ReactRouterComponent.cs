@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
+using System.Net.Http;
 using System.Threading.Tasks;
+using NodeReact.AspNetCore.ViewEngine;
 using NodeReact.Utils;
 
 namespace NodeReact.Components
@@ -32,12 +34,16 @@ namespace NodeReact.Components
             {
                 SerializedProps ??= _configuration.PropsSerializer.Serialize(Props);
 
-                var renderResult = await _nodeInvocationService.Invoke<Stream>(
+                var httpResponseMessage = await _nodeInvocationService.Invoke<HttpResponseMessage>(
                     "renderRouter",
-                    new object[] { ContainerId, ComponentName, ServerOnly, SerializedProps, Path });
+                    new object[] { ContainerId, ComponentName, ServerOnly, SerializedProps, new
+                    {
+                        disableStreaming = false,
+                        disableBootstrapPropsInPlace = false,
+                    }, Path });
 
                 OutputHtml = new PooledStream();
-                await renderResult.CopyToAsync(OutputHtml.Stream);
+                await httpResponseMessage.Content.CopyToAsync(OutputHtml.Stream);
 
                 return new RoutingContext();
             }
@@ -48,18 +54,22 @@ namespace NodeReact.Components
             }
         }
         
-        public async Task<RoutingContext> RenderToStream(Stream stream)
+        public async Task<RoutingContext> RenderToStream(Stream stream, NodeReactViewOptions options)
         {
             try
             {
                 SerializedProps ??= _configuration.PropsSerializer.Serialize(Props);
 
-                var renderResult = await _nodeInvocationService.Invoke<Stream>(
-                    "renderRouter",
-                    new object[] { ContainerId, ComponentName, ServerOnly, SerializedProps, Path });
+                var httpResponseMessage = await _nodeInvocationService.Invoke<HttpResponseMessage>(
+                    "renderComponent",
+                    new object[] { ContainerId, ComponentName, ServerOnly, SerializedProps, new
+                    {
+                        disableStreaming = options.DisableStreaming,
+                        disableBootstrapPropsInPlace = options.DisableBootstrapPropsInPlace,
+                        bootstrapScriptContent = options.BootstrapScriptContent,
+                    }, Path });
 
-                OutputHtml = new PooledStream();
-                await renderResult.CopyToAsync(stream);
+                await httpResponseMessage.Content.CopyToAsync(stream);
 
                 return new RoutingContext();
             }
@@ -84,7 +94,5 @@ namespace NodeReact.Components
         /// If included this signals that React Router determined a redirect should happen.
         /// </summary>
         public string Url { get; set; }
-        
-        
     }
 }

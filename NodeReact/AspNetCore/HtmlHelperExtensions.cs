@@ -104,6 +104,7 @@ namespace NodeReact.AspNetCore
         /// <param name="serverOnly">Skip rendering React specific data-attributes, container and client-side initialisation during server side rendering. Defaults to <c>false</c></param>
         /// <param name="containerClass">HTML class(es) to set on the container tag</param>
         /// <param name="exceptionHandler">A custom exception handler that will be called if a component throws during a render. Args: (Exception ex, string componentName, string containerId)</param>
+        /// <param name="hydrateInPlace">If true, the component will be hydrated in place, rather you should call ReactInitJavaScript or hydrate manually. Defaults ts <c>false</c></param>
         /// <returns>The component's HTML</returns>
         public static async Task<IHtmlContent> ReactAsync<T>(
             this IHtmlHelper htmlHelper,
@@ -114,11 +115,11 @@ namespace NodeReact.AspNetCore
             bool clientOnly = false,
             bool serverOnly = false,
             string containerClass = null,
-            Action<Exception, string, string> exceptionHandler = null
+            Action<Exception, string, string> exceptionHandler = null,
+            bool hydrateInPlace = false
         )
         {
             var scopedContext = htmlHelper.ViewContext.HttpContext.RequestServices.GetRequiredService<IReactScopedContext>();
-
             var reactComponent = scopedContext.CreateComponent<ReactComponent>(componentName: componentName);
 
             reactComponent.Props = props;
@@ -126,7 +127,7 @@ namespace NodeReact.AspNetCore
             reactComponent.ClientOnly = clientOnly;
             reactComponent.ServerOnly = serverOnly;
             reactComponent.ContainerClass = containerClass;
-
+            
             if (exceptionHandler != null)
             {
                 reactComponent.ExceptionHandler = exceptionHandler;
@@ -140,61 +141,6 @@ namespace NodeReact.AspNetCore
             await reactComponent.RenderHtml();
 
             return new ActionHtmlString(writer => reactComponent.WriteOutputHtmlTo(writer));
-        }
-
-        /// <summary>
-        /// Renders the specified React component, along with its client-side initialisation code.
-        /// Normally you would use the <see cref="React{T}"/> method, but <see cref="ReactWithInit{T}"/>
-        /// is useful when rendering self-contained partial views.
-        /// </summary>
-        /// <typeparam name="T">Type of the props</typeparam>
-        /// <param name="htmlHelper">HTML helper</param>
-        /// <param name="componentName">Name of the component</param>
-        /// <param name="props">Props to initialise the component with</param>
-        /// <param name="htmlTag">HTML tag to wrap the component in. Defaults to &lt;div&gt;</param>
-        /// <param name="containerId">ID to use for the container HTML tag. Defaults to an auto-generated ID</param>
-        /// <param name="clientOnly">Skip rendering server-side and only output client-side initialisation code. Defaults to <c>false</c></param>
-        /// <param name="containerClass">HTML class(es) to set on the container tag</param>
-        /// <param name="exceptionHandler">A custom exception handler that will be called if a component throws during a render. Args: (Exception ex, string componentName, string containerId)</param>
-        /// <returns>The component's HTML</returns>
-        public static async Task<IHtmlContent> ReactWithInitAsync<T>(
-            this IHtmlHelper htmlHelper,
-            string componentName,
-            T props,
-            string htmlTag = null,
-            string containerId = null,
-            bool clientOnly = false,
-            string containerClass = null,
-            Action<Exception, string, string> exceptionHandler = null
-        )
-        {
-            var scopedContext = htmlHelper.ViewContext.HttpContext.RequestServices.GetRequiredService<IReactScopedContext>();
-            var config = htmlHelper.ViewContext.HttpContext.RequestServices.GetRequiredService<ReactConfiguration>();
-
-            var reactComponent = scopedContext.CreateComponent<ReactComponent>(componentName: componentName);
-
-            reactComponent.Props = props;
-            reactComponent.ContainerId = containerId;
-            reactComponent.ClientOnly = clientOnly;
-            reactComponent.ContainerClass = containerClass;
-
-            if (exceptionHandler != null)
-            {
-                reactComponent.ExceptionHandler = exceptionHandler;
-            }
-
-            if (!string.IsNullOrEmpty(htmlTag))
-            {
-                reactComponent.ContainerTag = htmlTag;
-            }
-
-            await reactComponent.RenderHtml();
-
-            return new ActionHtmlString(writer =>
-            {
-                reactComponent.WriteOutputHtmlTo(writer);
-                WriteScriptTag(writer, bodyWriter => reactComponent.RenderJavaScript(bodyWriter), config.ScriptNonceProvider);
-            });
         }
 
         /// <summary>

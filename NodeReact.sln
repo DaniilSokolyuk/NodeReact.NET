@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NodeReact.Sample.Webpack.As
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NodeReact.Benchmarks", "NodeReact.Benchmarks\NodeReact.Benchmarks.csproj", "{9C5320AB-21A3-47B6-87D7-AB1D5DC00EA0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NodeReact.Sample.Webpack.AspNetCore.Streaming", "NodeReact.Sample.Webpack.AspNetCor.Streaming\NodeReact.Sample.Webpack.AspNetCore.Streaming.csproj", "{80567183-794B-4586-AA21-5A8C86EDDBDF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{9C5320AB-21A3-47B6-87D7-AB1D5DC00EA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9C5320AB-21A3-47B6-87D7-AB1D5DC00EA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9C5320AB-21A3-47B6-87D7-AB1D5DC00EA0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80567183-794B-4586-AA21-5A8C86EDDBDF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80567183-794B-4586-AA21-5A8C86EDDBDF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80567183-794B-4586-AA21-5A8C86EDDBDF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80567183-794B-4586-AA21-5A8C86EDDBDF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Buffers;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
-using Jering.Javascript.NodeJS;
 using Microsoft.IO;
-using Newtonsoft.Json;
 using NodeReact.Utils;
 
 namespace NodeReact.Components
@@ -31,8 +28,9 @@ namespace NodeReact.Components
             ExceptionHandler = _configuration.ExceptionHandler;
         }
 
-     
+
         private string _componentName;
+
         /// <summary>
         /// Gets or sets the name of the component
         /// </summary>
@@ -87,6 +85,8 @@ namespace NodeReact.Components
             get => !_configuration.UseServerSideRendering || _clientOnly;
             set => _clientOnly = value;
         }
+        
+        public string Nonce { get; set; }
 
         /// <summary>
         /// Sets the props for this component
@@ -96,13 +96,15 @@ namespace NodeReact.Components
         public Action<Exception, string, string> ExceptionHandler { get; set; }
 
         internal PropsSerialized SerializedProps { get; set; }
-        protected void WriterSerialziedProps(TextWriter writer)
+
+        private void WriterSerialziedProps(TextWriter writer)
         {
             SerializedProps ??= _configuration.PropsSerializer.Serialize(Props);
             WriteUtf8Stream(writer, SerializedProps.Stream);
         }
 
         private protected PooledStream OutputHtml { get; set; }
+
         public void WriteOutputHtmlTo(TextWriter writer)
         {
             if (ServerOnly)
@@ -134,18 +136,18 @@ namespace NodeReact.Components
             writer.Write(ContainerTag);
             writer.Write('>');
         }
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void WriteUtf8Stream(TextWriter writer, RecyclableMemoryStream stream)
         {
             stream.Position = 0;
             var textWriterBufferWriter = new TextWriterBufferWriter(writer);
-            
+
             Encoding.UTF8.GetDecoder().Convert(
-                stream.GetReadOnlySequence(), 
-                textWriterBufferWriter, 
-                true, 
-                out _, 
+                stream.GetReadOnlySequence(),
+                textWriterBufferWriter,
+                true,
+                out _,
                 out _);
         }
 
@@ -161,7 +163,7 @@ namespace NodeReact.Components
             if (ClientOnly)
             {
                 //ReactDOM.createRoot(document.getElementById("container")).render(React.createElement(HelloWorld, { name: "John" }));
-                writer.Write(ClientOnly ? "ReactDOM.createRoot(document.getElementById(\"" : "ReactDOM.hydrateRoot(document.getElementById(\"");
+                writer.Write("ReactDOM.createRoot(document.getElementById(\"");
                 writer.Write(ContainerId);
                 writer.Write("\")).render(React.createElement(");
                 writer.Write(ComponentName);
@@ -169,17 +171,9 @@ namespace NodeReact.Components
                 WriterSerialziedProps(writer);
                 writer.Write("))");
             }
-            else
-            {
-                //ReactDOM.hydrateRoot(document.getElementById("container"), React.createElement(HelloWorld, { name: "John" }))
-                writer.Write("ReactDOM.hydrateRoot(document.getElementById(\"");
-                writer.Write(ContainerId);
-                writer.Write("\"), React.createElement(");
-                writer.Write(ComponentName);
-                writer.Write(',');
-                WriterSerialziedProps(writer);
-                writer.Write("))");
-            }
+
+            //if not client only, server retunrs html and after js to hydrate
+            //server only hydration not required
         }
 
         public virtual void Dispose()

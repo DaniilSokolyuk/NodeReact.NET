@@ -38,3 +38,9 @@ services.AddNodeReact(
         config.UseDebugReact = true;
     });
 ```
+
+* Why isn't on-the-fly JSX to JavaScript compilation supported?
+We do not support real-time JavaScript conversion. This is because there are many different build tools, compilers, transpilers, and programming languages, and configuring them all is not a simple task. It is impossible to create a one-size-fits-all compilation solution that is both high-performing and efficient. Instead, we suggest that you create your own server bundle by examining the [sample](https://github.com/DaniilSokolyuk/NodeReact.NET/tree/master/NodeReact.Sample) provided in our repository.
+* Why isn't on-the-fly JSX to JavaScript compilation supported?
+If you have any ideas, please feel free to create a pull request as I am currently unsure how to implement this feature without a significant impact on performance
+
